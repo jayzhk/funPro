@@ -61,6 +61,14 @@ abstract class TweetSet {
     */
   def union(that: TweetSet): TweetSet
 
+
+  /**
+    * accumulate  the set to be unioned
+    * @param acc
+    * @return
+    */
+  def unionAcc(acc: TweetSet): TweetSet
+
   /**
     * Returns the tweet from this set which has the greatest retweet count.
     *
@@ -115,6 +123,8 @@ class Empty extends TweetSet {
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
+  def unionAcc(acc: TweetSet): TweetSet = acc
+
   def isEmpty: Boolean = true
 
   def union(that: TweetSet): TweetSet = that
@@ -152,8 +162,14 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   }
 
+  def unionAcc(acc: TweetSet) =  {
+    if(!left.isEmpty) left.unionAcc(acc.incl(elem))
+    else if(!right.isEmpty) right.unionAcc(acc.incl(elem))
+    else acc
+  }
+
   def union(that: TweetSet): TweetSet = {
-    ((left union right) union (that)).incl(elem)
+      unionAcc(that)
   }
 
   def mostRetweeted: Tweet = {
@@ -240,10 +256,10 @@ class Cons(val head: Tweet, val tail: TweetList) extends TweetList {
 
 object GoogleVsApple {
 
-  //val allTweet = TweetReader.allTweets;
-
   lazy val googleTweets: TweetSet =TweetReader.allTweets.filter(tw => google.exists(s=>tw.text.contains(s)))
+
   lazy val appleTweets: TweetSet = TweetReader.allTweets.filter(tw => apple.exists(s=>tw.text.contains(s)))
+
   /**
     * A list of all tweets mentioning a keyword from either apple or google,
     * sorted by the number of retweets.
