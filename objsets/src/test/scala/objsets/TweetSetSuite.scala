@@ -68,6 +68,16 @@ class TweetSetSuite extends FunSuite {
       val trends = set5.descendingByRetweet
       assert(!trends.isEmpty)
       assert(trends.head.user == "a" || trends.head.user == "b")
+      val filterList = List("boy", "d", "a")
+      val set7 = set3.filter((tw: Tweet) => (filterList.exists( s=> tw.text.contains(s))))
+      assert(size(set7) == 2)
+    }
+  }
+
+  test("Just to test List contains API") {
+    new TestSets {
+      val filterList = List("boy", "d")
+      assert(filterList.contains("d"))
     }
   }
 
