@@ -112,10 +112,10 @@ object Huffman {
       val n = trees.length / 2
       if(n == 2) trees
       else {
-        val codeTree = makeCodeTree(trees(0), trees(1))
-        
+        val (first, second) = trees splitAt 2
+        val fork = makeCodeTree(first(0), first(1))
+        (fork :: second).sortWith(weight(_) < weight(_))
       }
-
     }
   
   /**
@@ -135,7 +135,7 @@ object Huffman {
    *    the example invocation. Also define the return type of the `until` function.
    *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
    */
-    def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
+    def until(singleton: List[CodeTree] => Boolean, combine: List[CodeTree] => List[CodeTree])(zzz: List[CodeTree]): ??? = ???
   
   /**
    * This function creates a code tree which is optimal to encode the text `chars`.
