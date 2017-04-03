@@ -39,6 +39,11 @@ class HuffmanSuite extends FunSuite {
     println(list.foreach(println))
   }
 
+  test("create code tree should work") {
+    val chars = List('a', 'e', 't', 'w', 'e', 'q', 'b', 'a', 'y', 'j', 'a')
+    createCodeTree(chars)
+  }
+
 
   test("makeOrderedLeafList for some frequency table") {
     assert(makeOrderedLeafList(List(('t', 2), ('e', 1), ('x', 3))) === List(Leaf('e',1), Leaf('t',2), Leaf('x',3)))
@@ -48,6 +53,29 @@ class HuffmanSuite extends FunSuite {
   test("combine of some leaf list") {
     val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
     assert(combine(leaflist) === List(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4)))
+  }
+
+  test("combine of list of single or nil element") {
+    val leaf = List(Leaf('a', 2))
+    assert(combine(leaf) == leaf)
+    assert(Nil == combine(Nil))
+  }
+
+  test("encode something and see") {
+    new TestTrees {
+      val chars = List('a', 'e', 't', 'w', 'e', 'q', 'b', 'a', 'y', 'j', 'a')
+      val codeTree = createCodeTree(chars)
+     // val encoded = List(1, 1, 1, 0, 1, 0, 1, 0)
+            val encoded: List[Bit]= encode(codeTree)(List('e', 'a', 't', 'w'))
+           println("encoded e = " +  encode(codeTree)(List('e')))
+            println("encoded a = " +  encode(codeTree)(List('a')))
+            println("encoded t = " +  encode(codeTree)(List('t')))
+            println("encoded w = " +  encode(codeTree)(List('w')))
+            println("encoded = " + encoded)
+      val decoded = decode(codeTree, encoded)
+      println("decoded = " + decoded)
+
+    }
   }
 
 

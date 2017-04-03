@@ -110,8 +110,8 @@ object Huffman {
    * unchanged.
    */
     def combine(trees: List[CodeTree]): List[CodeTree] = {
-      val n = trees.length / 2
-      if(n == 2) trees
+      val n = trees.length
+      if(n <= 2) trees
       else {
         val (first, second) = trees splitAt 2
         val fork = makeCodeTree(first(0), first(1))
@@ -138,7 +138,16 @@ object Huffman {
    */
     def until(singleton: List[CodeTree] => Boolean, combine: List[CodeTree] => List[CodeTree])(codeTree: List[CodeTree]): CodeTree = {
       if(singleton(codeTree)) codeTree(0)
-      else {
+      else if(codeTree.length == 2) {
+        if(weight(codeTree(0)) > weight(codeTree(1))) {
+          val t1 = makeCodeTree(codeTree(0), codeTree(1))
+          t1
+        }
+        else {
+          val t2 = makeCodeTree(codeTree(1), codeTree(0))
+          t2
+        }
+      }else{
         val combined = combine(codeTree)
         until(singleton, combine)(combined)
       }
@@ -179,7 +188,6 @@ object Huffman {
         if(remind == Nil) acc ::: chars(leaf)
         else collect(acc ::: chars(leaf), remind)
       }
-
       collect(Nil, bits)
     }
   
@@ -213,7 +221,6 @@ object Huffman {
   /**
    * Write a function that returns the decoded secret
    */
-
   def decodedSecret: List[Char] = decode(frenchCode, secret)
   
 
@@ -228,9 +235,9 @@ object Huffman {
       def findLeaf(word: Char, acc : List[Bit], tree: CodeTree ): List[Bit] = tree match {
         case Fork(left, right, charsList, weight) =>
           if(chars(left).contains(word))
-            findLeaf(word, 0::acc, left)
+            findLeaf(word, acc ::: List(0) , left)
           else
-            findLeaf(word, 1::acc, right)
+            findLeaf(word, acc ::: List(1), right)
         case Leaf(charList, weight) => acc
         case _ => throw new Exception ("should not happen")
       }
@@ -268,9 +275,9 @@ object Huffman {
       def findLeaf(word: Char, acc : List[Bit], tree: CodeTree ): List[Bit] = tree match {
         case Fork(left, right, charsList, weight) =>
           if(chars(left).contains(word))
-            findLeaf(word, 0::acc, left)
+            findLeaf(word, acc ::: List(0), left)
           else
-            findLeaf(word, 1::acc, right)
+            findLeaf(word, acc ::: List(1), right)
         case Leaf(charList, weight) => acc
         case _ => throw new Exception ("should not happen")
       }
