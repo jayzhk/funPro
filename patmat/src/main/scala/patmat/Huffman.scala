@@ -235,9 +235,9 @@ object Huffman {
       def findLeaf(word: Char, acc : List[Bit], tree: CodeTree ): List[Bit] = tree match {
         case Fork(left, right, charsList, weight) =>
           if(chars(left).contains(word))
-            findLeaf(word, acc ::: List(0) , left)
+            findLeaf(word, acc ++ List(0) , left)
           else
-            findLeaf(word, acc ::: List(1), right)
+            findLeaf(word, acc ++ List(1), right)
         case Leaf(charList, weight) => acc
         case _ => throw new Exception ("should not happen")
       }
@@ -275,9 +275,9 @@ object Huffman {
       def findLeaf(word: Char, acc : List[Bit], tree: CodeTree ): List[Bit] = tree match {
         case Fork(left, right, charsList, weight) =>
           if(chars(left).contains(word))
-            findLeaf(word, acc ::: List(0), left)
+            findLeaf(word, acc ++ List(0), left)
           else
-            findLeaf(word, acc ::: List(1), right)
+            findLeaf(word, acc ++ List(1), right)
         case Leaf(charList, weight) => acc
         case _ => throw new Exception ("should not happen")
       }
@@ -309,7 +309,7 @@ object Huffman {
       val codeTable = convert(tree)
       def collect(acc: List[Bit], text: List[Char]) : List[Bit] = text match {
         case immutable.Nil => acc
-        case ::(head, tl) => collect(acc ::: codeBits(codeTable)(head), tl)
+        case ::(head, tl) => collect(acc ++ codeBits(codeTable)(head), tl)
       }
 
       collect(Nil, text)
