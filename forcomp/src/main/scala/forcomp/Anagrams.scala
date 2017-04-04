@@ -34,10 +34,10 @@ object Anagrams {
    *
    *  Note: you must use `groupBy` to implement this method!
    */
-  def wordOccurrences(w: Word): Occurrences = ???
+  def wordOccurrences(w: Word): Occurrences = w.groupBy(x => x.toLower).mapValues(x => x.length).toList.sorted
 
   /** Converts a sentence into its character occurrence list. */
-  def sentenceOccurrences(s: Sentence): Occurrences = ???
+  def sentenceOccurrences(s: Sentence): Occurrences = wordOccurrences(s.flatten.mkString)
 
   /** The `dictionaryByOccurrences` is a `Map` from different occurrences to a sequence of all
    *  the words that have that occurrence count.
@@ -54,10 +54,11 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = ???
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] =  dictionary.groupBy(x => wordOccurrences(x))
+
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = ???
+  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences.get(wordOccurrences(word)).get
 
   /** Returns the list of all subsets of the occurrence list.
    *  This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
@@ -81,7 +82,36 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = {
+
+    val flattened  = occurrences flatMap ( x => { for( i <- 1 to x._2) yield (x._1, i)})
+
+    def combine(xs : Occurrences): List[Occurrences] ={
+      ???
+    }
+
+
+
+   // val grouped = flattened.groupBy(x => x._1)
+
+
+//    val combination = for { i <- 0 to flattened.length -1
+//                            j <- i + 1 to flattened.length -1
+//                            if(flattened(i) != flattened(j) && flattened(i)._1 != flattened(j)._1)
+//    } yield flattened(i)
+
+//    val combination = for { x <- flattened
+//      i <- 0 until flattened.length
+//      if(x._1 != flattened(i)._1 && x != flattened(i))
+//    } yield flattened.
+//
+//
+    println(flattened)
+   // println(grouped)
+
+    ???
+
+  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *

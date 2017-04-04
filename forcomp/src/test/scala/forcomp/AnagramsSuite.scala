@@ -20,12 +20,30 @@ class AnagramsSuite extends FunSuite  {
 
 
   test("sentenceOccurrences: abcd e") {
+    val list = List("abcd", "e")
+    assert("abcde" == list.flatten.mkString)
+    wordOccurrences(list.flatten.mkString)
+
     assert(sentenceOccurrences(List("abcd", "e")) === List(('a', 1), ('b', 1), ('c', 1), ('d', 1), ('e', 1)))
   }
 
 
   test("dictionaryByOccurrences.get: eat") {
+    println(dictionary.take(2))
+    println(dictionary.map(x=> wordOccurrences(x)).take(2))
+    println(dictionary.take(2).groupBy(x => wordOccurrences(x)))
+    val list = List("aet", "eat", "tea")
+
+    println(list.map(x=> wordOccurrences(x)))
+    println(list.groupBy(x => wordOccurrences(x)))
+
     assert(dictionaryByOccurrences.get(List(('a', 1), ('e', 1), ('t', 1))).map(_.toSet) === Some(Set("ate", "eat", "tea")))
+  }
+
+
+  test("Combine method with dictionary occurrence") {
+    val list = wordOccurrences("aabbc")
+    combinations(list)
   }
 
 
