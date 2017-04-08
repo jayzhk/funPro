@@ -99,7 +99,7 @@ object ScalaTestRunner {
     runLog
   }
 
-  private def computeSummary(outFilePath: String, classpathString: String, logError: String => Unit): String = {
+  private def inovkeSummaryProcess(outFilePath: String, classpathString: String, logError: String => Unit): String = {
     val summaryFilePath = outFilePath + ".summary"
     val summaryCmd = "java" ::
       "-cp" :: classpathString ::
@@ -129,15 +129,15 @@ object ScalaTestRunner {
 
   def runScalaTest(classpath: Classpath, testClasses: File, outfile: File,
                    resourceFiles: List[File], javaSystemProperties: Traversable[(String, String)],
-                   logError: String => Unit, instragentPath: String) = {
+                   logError: String => Unit) = {
 
     // invoke scalatest in the separate process
     val classpathString = classpath map { case Attributed(file) => file.getAbsolutePath } mkString ":"
-    val cmd = scalaTestCommand(testClasses, outfile, resourceFiles, javaSystemProperties, classpathString, instragentPath)
+    val cmd = scalaTestCommand(testClasses, outfile, resourceFiles, javaSystemProperties, classpathString)
     val runLog = invokeScalaTestInSeparateProcess(cmd, logError)
 
     // compute the summary
-    val summaryFilePath = computeSummary(outfile.getAbsolutePath, classpathString, logError)
+    val summaryFilePath = inovkeSummaryProcess(outfile.getAbsolutePath, classpathString, logError)
     val summary = unpickleSummary(logError, runLog, summaryFilePath)
 
     // cleanup all the files
@@ -157,8 +157,7 @@ object ScalaTestRunner {
     }
   }
 
-  private def scalaTestCommand(testClasses: File, outfile: File, resourceFiles: List[File], javaSystemProperties: Traversable[(String, String)], classpathString: String,
-                               instragentPath: String): List[String] = {
+  private def scalaTestCommand(testClasses: File, outfile: File, resourceFiles: List[File], javaSystemProperties: Traversable[(String, String)], classpathString: String): List[String] = {
     val testRunPath = runPathString(testClasses)
     val resourceFilesString = resourceFiles.map(_.getAbsolutePath).mkString(":")
     // Deleting the file is helpful: it makes reading the file below crash in case ScalaTest doesn't
@@ -170,11 +169,7 @@ object ScalaTestRunner {
 
     // we don't specify "-w packageToTest" - the build file only compiles the tests
     // for the current project. so we don't need to do it again here.
-
-    // NOTICE: DON'T start test in parallel, it would break profiling. Check the
-    // implementation of @InstrumentedSuite for more details.
     "java" ::
-      s"-javaagent:$instragentPath" ::
       prop(Settings.scalaTestReportFileProperty, outfile.getAbsolutePath) ::
       prop(Settings.scalaTestIndividualTestTimeoutProperty, Settings.individualTestTimeout.toString) ::
       prop(Settings.scalaTestReadableFilesProperty, resourceFilesString) ::
@@ -188,10 +183,10 @@ object ScalaTestRunner {
   }
 
   def scalaTestGrade(gradingReporter: GradingFeedback, classpath: Classpath, testClasses: File, outfile: File,
-                     resourceFiles: List[File], javaSystemProperties: Traversable[(String, String)], instragentPath: String): Unit = {
+                     resourceFiles: List[File], javaSystemProperties: Traversable[(String, String)]): Unit = {
 
     val (score, maxScore, feedback, runLog) =
-      runScalaTest(classpath, testClasses, outfile, resourceFiles, javaSystemProperties, gradingReporter.testExecutionFailed, instragentPath)
+      runScalaTest(classpath, testClasses, outfile, resourceFiles, javaSystemProperties, gradingReporter.testExecutionFailed)
 
     if (score == maxScore) {
       gradingReporter.allTestsPassed()

@@ -35,5 +35,4 @@ trait CommonBuild extends Build {
 
   val commonSourcePackages = SettingKey[Seq[String]]("commonSourcePackages")
 
-  lazy val scalaTestDependency = "org.scalatest" %% "scalatest" % "2.2.4"
 }

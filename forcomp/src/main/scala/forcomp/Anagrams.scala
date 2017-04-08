@@ -86,31 +86,16 @@ object Anagrams {
 
     val flattened  = occurrences flatMap ( x => { for( i <- 1 to x._2) yield (x._1, i)})
 
-    def combine(xs : Occurrences): List[Occurrences] ={
-      ???
-    }
+    val length = flattened.length;
+    val  pairs = for {
+       i <- 0 until length
+       j <- i until length
+       if(flattened(i)._1 != flattened(j)._1)
+    }yield flattened(i) :: List(flattened(j))
 
+    val self = flattened.map(x => List(x))
 
-
-   // val grouped = flattened.groupBy(x => x._1)
-
-
-//    val combination = for { i <- 0 to flattened.length -1
-//                            j <- i + 1 to flattened.length -1
-//                            if(flattened(i) != flattened(j) && flattened(i)._1 != flattened(j)._1)
-//    } yield flattened(i)
-
-//    val combination = for { x <- flattened
-//      i <- 0 until flattened.length
-//      if(x._1 != flattened(i)._1 && x != flattened(i))
-//    } yield flattened.
-//
-//
-    println(flattened)
-   // println(grouped)
-
-    ???
-
+    List(Nil) ::: self ::: pairs.toList
   }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
@@ -123,7 +108,11 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    for {
+      e <- x if ! y.contains(e)
+    } yield e
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
@@ -165,5 +154,19 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] ={
+
+    val sentenceWord = combinations(sentenceOccurrences(sentence))
+    println(sentenceWord)
+
+    val filtered = dictionaryByOccurrences filter( x=> (x._1 forall (y=> sentenceWord.contains(y))))
+    println(filtered)
+
+    def matches(acc: List[Word], map: Map[Occurrences, List[Word]]): List[Word] = {
+      ???
+    }
+
+
+   List(Nil)
+  }
 }
