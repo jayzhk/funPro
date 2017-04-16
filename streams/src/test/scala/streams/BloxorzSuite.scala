@@ -39,6 +39,19 @@ class BloxorzSuite extends FunSuite {
     val optsolution = List(Right, Right, Down, Right, Right, Right, Down)
   }
 
+  test("optimal solution for level 1") {
+    new Level1 {
+      assert(solve(solution) == Block(goal, goal))
+    }
+  }
+
+  test("Block(Pos(4, 4), Pos(4, 4) is not legal"){
+    new Level1 {
+      val block = Block(Pos(4, 4), Pos(4, 4))
+      assert(!block.isLegal)
+    }
+  }
+
 
 	test("terrain function level 1") {
     new Level1 {
@@ -94,11 +107,9 @@ class BloxorzSuite extends FunSuite {
   }
 
 
-	test("optimal solution for level 1") {
-    new Level1 {
-      assert(solve(solution) == Block(goal, goal))
-    }
-  }
+
+
+
 
 
 	test("optimal solution length for level 1") {
