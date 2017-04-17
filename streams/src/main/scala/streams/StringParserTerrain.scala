@@ -54,9 +54,7 @@ trait StringParserTerrain extends GameDef {
 
      def isInTerrain(pos : Pos) : Boolean = {
 
-        if(levelVector.isDefinedAt(pos.row) &&
-          levelVector(pos.row).isDefinedAt(pos.col) &&
-          levelVector(pos.row)(pos.col) != '-') true else false
+        levelVector.isDefinedAt(pos.row) && levelVector(pos.row).isDefinedAt(pos.col) && levelVector(pos.row)(pos.col) != '-'
 
      }
     isInTerrain
