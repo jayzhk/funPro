@@ -9,7 +9,7 @@ trait Solver extends GameDef {
    * Returns `true` if the block `b` is at the final position
    */
 
-  def done(b: Block): Boolean = b.b1.row == goal.row && b.b1.col == goal.col  && b.b1.row == b.b2.row  && b.b1.col == b.b2.col
+  def done(b: Block): Boolean = b.b1.row == goal.row && b.b1.col == goal.col  //&& b.b1.row == b.b2.row  && b.b1.col == b.b2.col
 
   /**
    * This function takes two arguments: the current block `b` and
@@ -70,11 +70,11 @@ trait Solver extends GameDef {
     else {
       val more = for {
         path <- initial
-        next <- newNeighborsOnly(neighborsWithHistory(path._1, path._2),explored)
+        next <- neighborsWithHistory(path._1, path._2)
         if (!explored.contains(next._1))
       } yield next
 
-      initial ++ from(more, explored ++ (more map (_._1)))
+       initial ++ from(more, explored ++ (more map (_._1)))
     }
 
   }
@@ -91,15 +91,10 @@ trait Solver extends GameDef {
    * with the history how it was reached.
    */
   lazy val pathsToGoal: Stream[(Block, List[Move])] = {
-
-    val pathes = for(
+     for(
        path <- pathsFromStart
        if(done(path._1))
     )  yield path
-
-    println(pathes.toList)
-    pathes
-
   }
 
   /**
@@ -110,6 +105,7 @@ trait Solver extends GameDef {
    * the first move that the player should perform from the starting
    * position.
    */
-  lazy val solution: List[Move] = pathsToGoal.head._2
+  lazy val solution: List[Move] = pathsToGoal.head._2.reverse
+
 
 }

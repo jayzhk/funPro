@@ -14,7 +14,9 @@ class BloxorzSuite extends FunSuite {
      * is a valid solution, i.e. leads to the goal.
      */
     def solve(ls: List[Move]): Block =
-      ls.foldLeft(startBlock) { case (block, move) =>
+      ls.foldLeft(startBlock) {
+        case (block, move) =>
+        //  println(block) ; println(move)
         require(block.isLegal) // The solution must always lead to legal blocks
         move match {
           case Left => block.left
@@ -99,18 +101,6 @@ class BloxorzSuite extends FunSuite {
       ).toStream)
     }
   }
-
-  test("Test From and start path") {
-    new Level1 {
-      println(pathsFromStart)
-    }
-  }
-
-
-
-
-
-
 
 	test("optimal solution length for level 1") {
     new Level1 {
