@@ -38,30 +38,41 @@ package object scalashop {
 
   /** Computes the blurred RGBA value of a single pixel of the input image. */
   def boxBlurKernel(src: Img, x: Int, y: Int, radius: Int): RGBA = {
-      if(radius <= 0) src.apply(x, y)
-      else {
-        var r, g, b, a = 0
-        var i = clamp(x + 1 - radius, 0, x)
-        var j = clamp(y + 1 - radius, 0, y)
-        val avg =  (x + radius * 2 ) * (j)
-          while(i <= x + radius ){
-            while(j <= y + radius){
-              val c = src.apply(i, j)
-              r = r + red(c)
-              g = g + green(c)
-              b = b + blue(c)
-              a = a + alpha(c)
-              j = j + 1
-            }
-            i = i + 1
-          }
-        val times =
-        //rgba(r/(radius ))
-        ???
-      }
 
+//      if(radius <= 0) src.apply(x, y)
+//      else {
+//        var r, g, b, a = 0
+//        var i = clamp(x - radius, 0, x - radius)
+//        var j = clamp(y - radius, 0, y - radius)
+//        val avg = (x + radius + 1 - i) * (y + radius + 1 - j)
+//          while(i <= x + radius ){
+//            while(j <= y + radius){
+//              val c = src(i, j)
+//              r = r + red(c)
+//              g = g + green(c)
+//              b = b + blue(c)
+//              a = a + alpha(c)
+//              j = j + 1
+//            }
+//            i = i + 1
+//            j = clamp(y - radius, 0, y - radius)
+//          }
+//
+//        rgba(r/avg, g/avg, b/avg, a/avg)
+//      }
 
+    if(radius <= 0) src(x, y)
+    else {
 
+      val acc = for {
+        i <- clamp(x - radius, 0, x - radius) to (x + radius)
+        j <- clamp(y - radius, 0, y - radius) to (y + radius)
+        c = src(i, j)
+      } yield c
+
+      val length = acc.length;
+      val combined = acc.reduce((x, y) => rgba(red(x) + red(y), green(x) + green(y), blue(x) + blue(y), alpha(x) + alpha(y)))
+      rgba(red(combined) / length, green(combined) / length, blue(combined) / length, alpha(combined) / length)
+    }
   }
-
 }
