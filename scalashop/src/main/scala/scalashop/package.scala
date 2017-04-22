@@ -65,14 +65,22 @@ package object scalashop {
     else {
 
       val acc = for {
-        i <- clamp(x - radius, 0, x - radius) to (x + radius)
-        j <- clamp(y - radius, 0, y - radius) to (y + radius)
+        i <- clamp(x - radius, 0, x - radius) to clamp(x + radius, x, src.width  - 1)
+        j <- clamp(y - radius, 0, y - radius) to clamp(y + radius, y, src.height - 1)
         c = src(i, j)
       } yield c
 
-      val length = acc.length;
-      val combined = acc.reduce((x, y) => rgba(red(x) + red(y), green(x) + green(y), blue(x) + blue(y), alpha(x) + alpha(y)))
-      rgba(red(combined) / length, green(combined) / length, blue(combined) / length, alpha(combined) / length)
+      val length = acc.length
+      val r = acc.map(red).sum     / length
+      val g = (acc.map(green).sum) / length
+      val b = (acc.map(blue).sum ) / length
+      val a = (acc.map(alpha).sum) / length
+
+    //  println(s"r = ${r} g = ${g} b = ${b} a = ${a}")
+
+     // val combined = acc.reduce((x, y) => rgba(red(x) + red(y), green(x) + green(y), blue(x) + blue(y), alpha(x) + alpha(y)))
+     // rgba(red(combined) / length, green(combined) / length, blue(combined) / length, alpha(combined) / length)
+      rgba(r,g,b,a)
     }
   }
 }

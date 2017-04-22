@@ -1,11 +1,8 @@
 package scalashop
 
-import java.util.concurrent._
-import scala.collection._
-import org.scalatest.FunSuite
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import common._
 
 @RunWith(classOf[JUnitRunner])
 class BlurSuite extends FunSuite {
@@ -31,7 +28,13 @@ class BlurSuite extends FunSuite {
     assert(boxBlurKernel(src, 1, 2, 1) === 12,
       s"(boxBlurKernel(1, 2, 1) should be 12, " +
         s"but it's ${boxBlurKernel(src, 1, 2, 1)})")
+
+    assert(boxBlurKernel(src, 0, 0, 1) === 2)
+    assert(boxBlurKernel(src, 2, 0, 1) === 3)
+    assert(boxBlurKernel(src, 1, 0, 1) === 2)
   }
+
+
 
   test("HorizontalBoxBlur.blur with radius 1 should correctly blur the entire 3x3 image") {
     val w = 3
@@ -87,6 +90,25 @@ class BlurSuite extends FunSuite {
     check(1, 2, 5)
     check(2, 2, 5)
     check(3, 2, 6)
+
+   // VerticalBoxBlur.parBlur(src, dst, 2, 1)
+  }
+
+  test("Test the by method of Range") {
+
+
+    println((0 to 32).by(32))
+    println((0 to 50).by(32))
+    println((0 to 100).by(32))
+    println(s"31/32=${31/32} 32/32=${32/32} 40/32 = ${40/32}  100/32 = ${100/32}")
+    val batch = (0 until 32).by(32)
+    println((batch zip batch.tail).isEmpty)
+
+   // println((0 to 32).by(0))
+
+
+
+
   }
 
 

@@ -1,7 +1,6 @@
 package scalashop
 
 import org.scalameter._
-import common._
 
 object HorizontalBoxBlurRunner {
 
@@ -42,9 +41,11 @@ object HorizontalBoxBlur {
    *  Within each row, `blur` traverses the pixels by going from left to right.
    */
   def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit = {
-  // TODO implement this method using the `boxBlurKernel` method
 
-  ???
+    for {
+      x <- 0 until src.width
+      y <- from until end
+    } dst.update(x, y, boxBlurKernel(src, x, y, radius))
   }
 
   /** Blurs the rows of the source image in parallel using `numTasks` tasks.
@@ -54,9 +55,38 @@ object HorizontalBoxBlur {
    *  rows.
    */
   def parBlur(src: Img, dst: Img, numTasks: Int, radius: Int): Unit = {
-  // TODO implement using the `task` construct and the `blur` method
 
-  ???
+    println(s"H src height = ${src.height} and src width = ${src.width}  and numOfTask = ${numTasks}")
+
+    if (numTasks == 1) blur(src, dst, 0, src.height, radius)
+    else {
+      var step = src.height / numTasks
+      if (step <= 1) {
+        step = 1
+      }
+
+      val batch = (0 to src.height).by(step)
+      val combine = batch zip batch.tail
+
+      println(s"H Identified ranges = ${combine}")
+
+      val tasks = for {
+        (start, end) <- combine
+        work = common.task {
+          println(s" H (start, end)  = (${start}, ${end})");
+          blur(src, dst, start, end, radius)
+        }
+      } yield work
+
+      tasks.foreach(_.join)
+
+      if (src.height % step > 0) {
+        println(s" H Last Task = ${src.height - src.height % step}  ${src.height}")
+
+        val endTask = common.task(blur(src, dst, (src.height - src.height % step), src.height, radius))
+        endTask.join
+      }
+    }
   }
 
 }
