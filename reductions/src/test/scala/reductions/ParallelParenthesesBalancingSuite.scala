@@ -1,13 +1,9 @@
 package reductions
 
-import java.util.concurrent._
-import scala.collection._
-import org.scalatest.FunSuite
 import org.junit.runner.RunWith
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import common._
-
-import ParallelParenthesesBalancing._
+import reductions.ParallelParenthesesBalancing._
 
 @RunWith(classOf[JUnitRunner])
 class ParallelParenthesesBalancingSuite extends FunSuite {
@@ -43,6 +39,13 @@ class ParallelParenthesesBalancingSuite extends FunSuite {
     check(".(", false)
     check("(.", false)
     check(").", false)
+  }
+
+  test("tuple addition test ") {
+    val a = (1, 1)
+    val b = (1, 1)
+    println(a == b)
+
   }
 
 

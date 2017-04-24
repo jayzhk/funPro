@@ -16,9 +16,11 @@ object ParallelParenthesesBalancingRunner {
   ) withWarmer(new Warmer.Default)
 
   def main(args: Array[String]): Unit = {
-    val length = 100000000
+   // val length = 100000000
+    val length = 100000
     val chars = new Array[Char](length)
-    val threshold = 10000
+    //val threshold = 10000
+    val threshold = 100
     val seqtime = standardConfig measure {
       seqResult = ParallelParenthesesBalancing.balance(chars)
     }
@@ -53,15 +55,38 @@ object ParallelParenthesesBalancing {
    */
   def parBalance(chars: Array[Char], threshold: Int): Boolean = {
 
-    def traverse(idx: Int, until: Int, arg1: Int, arg2: Int) /*: ???*/ = {
-        
+    def traverse(idx: Int, until: Int, arg1: Int, arg2: Int)  : (Int, Int) = {
+      var i = idx ;
+      var (open, close) = (arg1, arg2)
+      while(i < until){
+         chars(i) match  {
+           case '(' => open = open + 1
+           case ')' => if(open > 0) open = open -1 else close = close + 1
+           case _ =>
+         }
+        i = i + 1
+      }
+
+      (open, close)
+
+
+//      if(idx == until)  (arg1 - arg2)
+//      else if(chars(idx) == '(') traverse(idx + 1, until, arg1 + 1, arg2)
+//      else if(chars(idx) == ')') traverse(idx + 1, until, arg1, arg2 + 1)
+//      else traverse(idx + 1, until, arg1, arg2)
     }
 
-    def reduce(from: Int, until: Int) /*:???*/ = {
-      ???
-    }
+    def reduce(from: Int, until: Int) : (Int, Int) = {
 
-    reduce(0, chars.length) == ???
+      if(until - from < threshold) {
+        traverse(from, until, 0, 0)
+      }else {
+        val mid = from + (until - from) / 2
+        val (l, r) = common.parallel(reduce(from, mid), reduce(mid, until))
+        (l._1 - r._2, l._2 - r._1)
+      }
+    }
+    reduce(0, chars.length) == (0, 0)
   }
 
   // For those who want more:
