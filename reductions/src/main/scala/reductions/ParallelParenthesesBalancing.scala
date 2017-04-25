@@ -42,13 +42,23 @@ object ParallelParenthesesBalancing {
    */
   def balance(chars: Array[Char]): Boolean = {
 
-    def balanced(xs: Array[Char], open: Int): Boolean = {
-      if(xs.isEmpty) open == 0
-      else if(xs.head == '(') balanced(xs.tail, open + 1)
-      else if(xs.head == ')') open > 0 && balanced(xs.tail, open -1)
-      else balanced(xs.tail, open)
-    }
-    balanced(chars, 0)
+ //   def balanced(xs: Array[Char], open: Int): Boolean = {
+//      if(xs.isEmpty) open == 0
+//      else if(xs.head == '(') balanced(xs.tail, open + 1)
+//      else if(xs.head == ')') open > 0 && balanced(xs.tail, open -1)
+//      else balanced(xs.tail, open)
+//    }
+//    balanced(chars, 0)
+      var idx = 0 ; var (open, close) = (0, 0)
+      while(idx < chars.length){
+        if(chars(idx) == '(')  open = open + 1 ;
+        else if(chars(idx) == ')') {
+          if (open > 0) open = open - 1
+          else close = close + 1
+        }
+        idx = idx + 1
+      }
+      open == 0 && close == 0
   }
 
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
@@ -59,11 +69,17 @@ object ParallelParenthesesBalancing {
       var i = idx ;
       var (open, close) = (arg1, arg2)
       while(i < until){
-         chars(i) match  {
-           case '(' => open = open + 1
-           case ')' => if(open > 0) open = open -1 else close = close + 1
-           case _ =>
-         }
+//         chars(i) match  {
+//           case '(' => open = open + 1
+//           case ')' => if(open > 0) open = open -1 else close = close + 1
+//           case _ =>
+//         }
+        val v = chars(i)
+        if(v == '(') open = open + 1
+        else if (v == ')') {
+          if(open > 0) open = open -1
+          else close = close + 1
+        }
         i = i + 1
       }
 
