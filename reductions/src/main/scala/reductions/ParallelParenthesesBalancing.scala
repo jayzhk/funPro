@@ -16,11 +16,11 @@ object ParallelParenthesesBalancingRunner {
   ) withWarmer(new Warmer.Default)
 
   def main(args: Array[String]): Unit = {
-   // val length = 100000000
-    val length = 100000
+    val length = 100000000
+    //val length = 100000
     val chars = new Array[Char](length)
-    //val threshold = 10000
-    val threshold = 100
+    val threshold = 10000
+    //val threshold = 1000
     val seqtime = standardConfig measure {
       seqResult = ParallelParenthesesBalancing.balance(chars)
     }
@@ -83,7 +83,7 @@ object ParallelParenthesesBalancing {
       }else {
         val mid = from + (until - from) / 2
         val (l, r) = common.parallel(reduce(from, mid), reduce(mid, until))
-        (l._1 - r._2, l._2 - r._1)
+        (l._1 - r._2, l._2 + r._1)
       }
     }
     reduce(0, chars.length) == (0, 0)
