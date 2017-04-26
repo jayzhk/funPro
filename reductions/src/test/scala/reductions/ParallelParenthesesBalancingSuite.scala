@@ -8,6 +8,12 @@ import reductions.ParallelParenthesesBalancing._
 @RunWith(classOf[JUnitRunner])
 class ParallelParenthesesBalancingSuite extends FunSuite {
 
+  test("test string length nested parentheses  and threshold = 1 ") {
+    var value = "(()())".toCharArray;
+    println(parBalance(value, 1))
+
+  }
+
   test("balance should work for empty string") {
     def check(input: String, expected: Boolean) =
       assert(balance(input.toArray) == expected,
@@ -40,6 +46,13 @@ class ParallelParenthesesBalancingSuite extends FunSuite {
     check("(.", false)
     check(").", false)
   }
+
+  test("test string length = 2 and threshold = 1 ") {
+    println(parBalance(Array[Char]('(',')'), 1))
+
+  }
+
+
 
   test("tuple addition test ") {
     val a = (1, 1)

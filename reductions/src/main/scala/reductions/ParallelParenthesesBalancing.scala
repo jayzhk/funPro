@@ -42,13 +42,6 @@ object ParallelParenthesesBalancing {
    */
   def balance(chars: Array[Char]): Boolean = {
 
- //   def balanced(xs: Array[Char], open: Int): Boolean = {
-//      if(xs.isEmpty) open == 0
-//      else if(xs.head == '(') balanced(xs.tail, open + 1)
-//      else if(xs.head == ')') open > 0 && balanced(xs.tail, open -1)
-//      else balanced(xs.tail, open)
-//    }
-//    balanced(chars, 0)
       var idx = 0 ; var (open, close) = (0, 0)
       while(idx < chars.length){
         if(chars(idx) == '(')  open = open + 1 ;
@@ -69,11 +62,6 @@ object ParallelParenthesesBalancing {
       var i = idx ;
       var (open, close) = (arg1, arg2)
       while(i < until){
-//         chars(i) match  {
-//           case '(' => open = open + 1
-//           case ')' => if(open > 0) open = open -1 else close = close + 1
-//           case _ =>
-//         }
         val v = chars(i)
         if(v == '(') open = open + 1
         else if (v == ')') {
@@ -82,24 +70,17 @@ object ParallelParenthesesBalancing {
         }
         i = i + 1
       }
-
       (open, close)
-
-
-//      if(idx == until)  (arg1 - arg2)
-//      else if(chars(idx) == '(') traverse(idx + 1, until, arg1 + 1, arg2)
-//      else if(chars(idx) == ')') traverse(idx + 1, until, arg1, arg2 + 1)
-//      else traverse(idx + 1, until, arg1, arg2)
     }
 
     def reduce(from: Int, until: Int) : (Int, Int) = {
 
-      if(until - from < threshold) {
+      if(until - from <= threshold) {
         traverse(from, until, 0, 0)
       }else {
         val mid = from + (until - from) / 2
         val (l, r) = common.parallel(reduce(from, mid), reduce(mid, until))
-        (l._1 - r._2, l._2 + r._1)
+        (l._1 - r._2 + r._1 , l._2 + r._1)
       }
     }
     reduce(0, chars.length) == (0, 0)

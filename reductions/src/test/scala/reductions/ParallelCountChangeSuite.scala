@@ -63,5 +63,12 @@ class ParallelCountChangeSuite extends FunSuite {
     check(250, List(1, 2, 5, 10, 20, 50), 177863)
   }
 
+  test("test parCountChange with money == 16 and coins == List(1), money threshold = 16"){
+     parCountChange(16, List(1),  moneyThreshold(16))
+//    def check(money : Int, coins : List[Int]): Unit ={
+//
+//    }
+  }
+
 
 }
