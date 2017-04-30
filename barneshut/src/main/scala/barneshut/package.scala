@@ -170,14 +170,22 @@ package object barneshut {
     for (i <- 0 until matrix.length) matrix(i) = new ConcBuffer
 
     def +=(b: Body): SectorMatrix = {
-      ???
+
+      var (posX, posY) =  (((b.x - boundaries.minX) / sectorSize).toInt, ((b.y - boundaries.minY) / sectorSize).toInt)
+      posX = { if(posX < 0 ) 0 else if (posX >=  sectorPrecision)  sectorPrecision - 1 else posX }
+      posY = { if(posY < 0 ) 0 else if (posY >= sectorPrecision) sectorPrecision - 1 else posY }
+      val pos = posX + posY * sectorPrecision
+      val cb = matrix(pos)
+      cb += b
+
       this
     }
 
     def apply(x: Int, y: Int) = matrix(y * sectorPrecision + x)
 
     def combine(that: SectorMatrix): SectorMatrix = {
-      ???
+       for( i <- 0 until matrix.length) matrix.update(i, matrix(i).combine(that.matrix(i)))
+       this
     }
 
     def toQuad(parallelism: Int): Quad = {
