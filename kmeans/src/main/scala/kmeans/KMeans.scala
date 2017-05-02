@@ -71,7 +71,7 @@ class KMeans {
   final def kMeans(points: GenSeq[Point], means: GenSeq[Point], eta: Double): GenSeq[Point] = {
     if (!converged(eta)(means, update(classify(points, means), means)))
       kMeans(points, update(classify(points, means), means), eta)
-    else  update(classify(points, means), means)// your implementation need to be tail recursive
+    else  update(classify(points, means), means)
   }
 }
 
@@ -86,6 +86,10 @@ class Point(val x: Double, val y: Double, val z: Double) {
   }
   private def round(v: Double): Double = (v * 100).toInt / 100.0
   override def toString = s"(${round(x)}, ${round(y)}, ${round(z)})"
+}
+
+object Point{
+  def apply( x: Double, y: Double, z: Double): Point = new Point(x, y, z)
 }
 
 

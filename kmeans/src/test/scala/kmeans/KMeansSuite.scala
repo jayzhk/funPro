@@ -74,6 +74,17 @@ class KMeansSuite extends FunSuite {
     checkParClassify(points, means, expected)
   }
 
+  test("test converged") {
+
+  }
+
+  test("checking Kmeans with points and old means") {
+    val points = GenSeq(Point(0, 0, 1), Point(0,0, -1), Point(0,1,0), Point(0,10,0))
+    val oldMeans = GenSeq(Point(0, -1, 0), Point(0, 2, 0))
+    val eta = 12.25
+    println(kMeans(points, oldMeans, eta))
+  }
+
 }
 
 
