@@ -1,2 +1,6 @@
 **/target/
+<<<<<<< HEAD
 **/.idea/
+=======
+**/.idea/*
+>>>>>>> 8b8861cf19e59aa4928474d5dbe9eb29dd2f22cf
