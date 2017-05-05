@@ -1,11 +1,9 @@
 package quickcheck
 
-import common._
-
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen._
+import org.scalacheck.Prop._
 import org.scalacheck._
-import Arbitrary._
-import Gen._
-import Prop._
 
 abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
 
