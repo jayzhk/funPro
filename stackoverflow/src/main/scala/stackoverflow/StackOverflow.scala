@@ -18,7 +18,7 @@ object StackOverflow extends StackOverflow {
   /** Main function */
   def main(args: Array[String]): Unit = {
 
-    val lines   = sc.textFile("src/main/resources/stackoverflow/stackoverflow2.csv")
+    val lines   = sc.textFile("src/main/resources/stackoverflow/stackoverflow.csv")
     val raw     = rawPostings(lines)
    // assert(raw.count() == 58313, "*********** raw items ===== *************" + raw.count())
     val grouped = groupedPostings(raw)
@@ -287,8 +287,10 @@ class StackOverflow extends Serializable {
         lang
       }// most common language in the cluster
       val langPercent: Double = {
-        val result = vs.groupBy(k => k._1).maxBy(k => k._2.size)._2.size.toDouble
-        println(vs.size + "************** most common Lange in  the cluster = " + result)
+        val result = vs.groupBy(_._1).maxBy(_._2.size)._2.size / vs.size
+        //res
+
+      //  println(vs.size + "************** most common Lange in  the cluster = " + result)
         result
       }// percent of the questions in the most common language
       val clusterSize: Int    = vs.size
