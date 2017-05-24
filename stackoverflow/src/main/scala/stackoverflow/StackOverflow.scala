@@ -18,7 +18,7 @@ object StackOverflow extends StackOverflow {
   /** Main function */
   def main(args: Array[String]): Unit = {
 
-    val lines   = sc.textFile("src/main/resources/stackoverflow/stackoverflow2.csv")
+    val lines   = sc.textFile("src/main/resources/stackoverflow/stackoverflow.csv")
     val raw     = rawPostings(lines)
    // assert(raw.count() == 58313, "*********** raw items ===== *************" + raw.count())
     val grouped = groupedPostings(raw)
@@ -180,10 +180,11 @@ class StackOverflow extends Serializable {
    // newMeans.foreach(println)
     val closest = vectors.map(p => (findClosest(p, means), p))
     val closestGrouped = closest.groupByKey()
-    val updated = closestGrouped.mapValues(p => averageVectors(p)).collect()
-    updated.foreach(k => newMeans.update(k._1, k._2))
+    val updates = closestGrouped.mapValues(p => averageVectors(p)).collect()
+   // updated.foreach(k => newMeans.update(k._1, k._2))
+    for((idx, avg) <- updates) newMeans.update(idx, avg)
 
-    //newMeans.foreach(println)
+    newMeans.foreach(println)
 
     // TODO: Fill in the newMeans array
     val distance = euclideanDistance(means, newMeans)
@@ -282,21 +283,29 @@ class StackOverflow extends Serializable {
   //  closestGrouped.val
     val median = closestGrouped.mapValues { vs =>
 
-      val groupByLanage = vs.groupBy(k => k._1)
-      groupByLanage.foreach(println)
+      val mostCommon = vs.groupBy(k => k._1).maxBy(_._2.size)
+    //  groupByLanage.foreach(println)
       val langLabel: String   =  {
-        val lang = langs((groupByLanage.maxBy(_._2.size)._1 ) / langSpread)
+        val lang = langs(mostCommon._1 / langSpread)
         lang
       }// most common language in the cluster
       val langPercent: Double = {
-       // val result = groupByLanage.
-        1d
+
+        mostCommon._2.size.toDouble / vs.size
+
       }// percent of the questions in the most common language
       val clusterSize: Int    = vs.size
-      val medianScore: Int    = vs.map(k=>k._2).sum / clusterSize
+      val medianScore: Int    = {
+          //vs.foreach(println)
+          val scoreList = vs.map(_._2).toList.sorted
+          val middle = scoreList.size / 2
+          scoreList.foreach(println)
+          if(scoreList.size % 2 == 0) (scoreList(middle) + scoreList(middle - 1)) / 2 else scoreList(middle)
+      }
 
       (langLabel, langPercent, clusterSize, medianScore)
     }
+
 
     median.collect().map(_._2).sortBy(_._4)
   }
@@ -306,6 +315,6 @@ class StackOverflow extends Serializable {
     println("  Score  Dominant language (%percent)  Questions")
     println("================================================")
     for ((lang, percent, size, score) <- results)
-      println(f"${score}%7d  ${lang}%-17s (${percent}%-5.1f%%)      ${size}%7d")
+      println(f"${score}%7d  ${lang}%-17s (${percent}%-5.2f%%)      ${size}%7d")
   }
 }
