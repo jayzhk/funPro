@@ -15,7 +15,7 @@ list(list.size /2)
 list(list.size /2 - 1)
 if(list.size % 2 == 1 ) list(list.size / 2) else
   (list(list.size /2) +
-  list(list.size/2 -1)).toDouble /2
+  list(list.size/2 -1)) /2
 6.0d / 8
 
 

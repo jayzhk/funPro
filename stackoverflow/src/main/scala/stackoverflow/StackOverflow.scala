@@ -179,12 +179,12 @@ class StackOverflow extends Serializable {
     val newMeans = means.clone() // you need to compute newMeans
    // newMeans.foreach(println)
     val closest = vectors.map(p => (findClosest(p, means), p))
-    val closestGrouped = closest.groupByKey()
+    val closestGrouped = closest.groupByKey().cache()
     val updates = closestGrouped.mapValues(p => averageVectors(p)).collect()
    // updated.foreach(k => newMeans.update(k._1, k._2))
     for((idx, avg) <- updates) newMeans.update(idx, avg)
 
-    newMeans.foreach(println)
+   // newMeans.foreach(println)
 
     // TODO: Fill in the newMeans array
     val distance = euclideanDistance(means, newMeans)
@@ -291,15 +291,15 @@ class StackOverflow extends Serializable {
       }// most common language in the cluster
       val langPercent: Double = {
 
-        mostCommon._2.size.toDouble / vs.size
+        (mostCommon._2.size.toDouble / vs.size ) * 100
 
       }// percent of the questions in the most common language
       val clusterSize: Int    = vs.size
       val medianScore: Int    = {
           //vs.foreach(println)
-          val scoreList = vs.map(_._2).toList.sorted
+          val scoreList = mostCommon._2.map(_._2).toList.sorted
           val middle = scoreList.size / 2
-          scoreList.foreach(println)
+         // scoreList.foreach(println)
           if(scoreList.size % 2 == 0) (scoreList(middle) + scoreList(middle - 1)) / 2 else scoreList(middle)
       }
 
@@ -315,6 +315,6 @@ class StackOverflow extends Serializable {
     println("  Score  Dominant language (%percent)  Questions")
     println("================================================")
     for ((lang, percent, size, score) <- results)
-      println(f"${score}%7d  ${lang}%-17s (${percent}%-5.2f%%)      ${size}%7d")
+      println(f"${score}%7d  ${lang}%-17s (${percent}%-5.1f%%)      ${size}%7d")
   }
 }

@@ -52,5 +52,23 @@ class StackOverflowSuite extends FunSuite with BeforeAndAfterAll {
     testObject.printResults(testObject.clusterResults(centers, rdd))
   }
 
+  test("clusterResults2"){
+    val centers = Array((0,0), (100000, 0))
+    val rdd = StackOverflow.sc.parallelize(List(
+      (0, 1000),
+      (0, 23),
+      (0, 234),
+      (0, 0),
+      (0, 1),
+      (0, 1),
+      (50000, 2),
+      (50000, 10),
+      (100000, 2),
+      (100000, 5),
+      (100000, 10),
+      (200000, 100)  ))
+    testObject.printResults(testObject.clusterResults(centers, rdd))
+  }
+
 
 }
