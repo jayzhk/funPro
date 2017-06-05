@@ -9,7 +9,6 @@ import org.apache.spark.sql.types._
 object TimeUsage {
 
   import org.apache.spark.sql.SparkSession
-  import org.apache.spark.sql.functions._
 
   val spark: SparkSession =
     SparkSession
@@ -62,15 +61,17 @@ object TimeUsage {
     *         have type Double. None of the fields are nullable.
     * @param columnNames Column names of the DataFrame
     */
-  def dfSchema(columnNames: List[String]): StructType =
-    ???
+  def dfSchema(columnNames: List[String]): StructType = {
+    val firstColumn = StructField(columnNames.head, StringType, nullable = false)
+    val tails = columnNames.tail.map(fieldName => StructField(fieldName, DoubleType, nullable = false))
+    StructType(firstColumn :: tails)
+  }
 
 
   /** @return An RDD Row compatible with the schema produced by `dfSchema`
     * @param line Raw fields
     */
-  def row(line: List[String]): Row =
-    ???
+  def row(line: List[String]): Row = Row.fromSeq(line)
 
   /** @return The initial data frame columns partitioned in three groups: primary needs (sleeping, eating, etc.),
     *         work and other (leisure activities)
@@ -88,7 +89,15 @@ object TimeUsage {
     *    “t10”, “t12”, “t13”, “t14”, “t15”, “t16” and “t18” (those which are not part of the previous groups only).
     */
   def classifiedColumns(columnNames: List[String]): (List[Column], List[Column], List[Column]) = {
-    ???
+    val primaryNeedsStartWith = List("t01", "t03", "t11", "t1801", "t1803")
+    val workingStartWith = List("t05", "t1805")
+    //val otherStartWith = List("t02", "t04")
+
+    val primaryNeeds = columnNames.filter(col => primaryNeedsStartWith.exists(col.startsWith(_)))
+    val workingActivity = columnNames.filter(col => workingStartWith.exists(col.startsWith(_)))
+    val others = (columnNames.toSet -- primaryNeeds -- workingActivity).toList
+
+    (primaryNeeds.map(new Column(_)), workingActivity.map(new Column(_)), others.map(new Column(_)))
   }
 
   /** @return a projection of the initial DataFrame such that all columns containing hours spent on primary needs
@@ -198,7 +207,6 @@ object TimeUsage {
     * Hint: you should use the `groupByKey` and `typed.avg` methods.
     */
   def timeUsageGroupedTyped(summed: Dataset[TimeUsageRow]): Dataset[TimeUsageRow] = {
-    import org.apache.spark.sql.expressions.scalalang.typed
     ???
   }
 }
