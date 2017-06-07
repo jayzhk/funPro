@@ -4,6 +4,7 @@ import java.nio.file.Paths
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions._
 
 /** Main class */
 object TimeUsage {
@@ -136,9 +137,10 @@ object TimeUsage {
     otherColumns: List[Column],
     df: DataFrame
   ): DataFrame = {
-    val workingStatusProjection: Column = ???
-    val sexProjection: Column = ???
-    val ageProjection: Column = ???
+    val workingStatusProjection: Column = when(df("telfs") >= 1 && df("telfs") < 3, "working").otherwise("not working").as("working")
+    val sexProjection: Column = when(df("tesex") === 1, "male").otherwise("female").as("sex")
+    val ageProjection: Column = when(df("teage") >= 15 && df("teage") <= 22, "young")
+      .when(df("teage") >= 23 && df("teage") <= 55, "active").otherwise("elder").as("age")
 
     val primaryNeedsProjection: Column = ???
     val workProjection: Column = ???
