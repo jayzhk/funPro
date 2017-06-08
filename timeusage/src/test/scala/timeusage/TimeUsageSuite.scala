@@ -30,14 +30,18 @@ class TimeUsageSuite extends FunSuite with BeforeAndAfterAll {
   test("test group and value converting") {
 
     val df = spark.createDataFrame(Seq(
-      (1.0, 0.3, 1.0), (1.0, 0.5, 0.0),
-      (-1.0, 0.6, 0.5), (-1.0, 5.6, 0.2))
+      (5, 15, 20), (8, 20, 30),
+      (7, 20, 50), (6, 15, 18))
     ).toDF("col1", "col2", "col3")
 
     val col1 = when(df("col1") > 0, "positive").otherwise("negative").as("pos")
     println(col1)
 
-    df.groupBy(df("col1")).sum().show()
+    val colList = List(df("col1"), df("col2"), df("col3"))
+    val column = colList.reduce(_ + _)./(60).as("POS")
+    df.select(column).show()
+
+  //df.groupBy(df("col1"), df("col2"), df("col3")).sum().as("sumup").show()
 
   }
 }

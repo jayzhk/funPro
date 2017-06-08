@@ -30,7 +30,8 @@ object TimeUsage {
     val (columns, initDf) = read("/timeusage/atussum.csv")
     val (primaryNeedsColumns, workColumns, otherColumns) = classifiedColumns(columns)
     val summaryDf = timeUsageSummary(primaryNeedsColumns, workColumns, otherColumns, initDf)
-    val finalDf = timeUsageGrouped(summaryDf)
+  //  val finalDf = timeUsageGrouped(summaryDf)
+    val finalDf = timeUsageGroupedSql(summaryDf)
     finalDf.show()
   }
 
@@ -46,7 +47,7 @@ object TimeUsage {
       rdd
         .mapPartitionsWithIndex((i, it) => if (i == 0) it.drop(1) else it) // skip the header line
         .map(_.split(",").to[List])
-        .map(row)
+        .map(f => row(f))
 
     val dataFrame =
       spark.createDataFrame(data, schema)
@@ -72,7 +73,10 @@ object TimeUsage {
   /** @return An RDD Row compatible with the schema produced by `dfSchema`
     * @param line Raw fields
     */
-  def row(line: List[String]): Row = Row.fromSeq(line)
+  def row(line: List[String]): Row = {
+    val value = line.head :: line.tail.map(_.toDouble)
+    Row.fromSeq(value)
+  }
 
   /** @return The initial data frame columns partitioned in three groups: primary needs (sleeping, eating, etc.),
     *         work and other (leisure activities)
@@ -96,7 +100,8 @@ object TimeUsage {
 
     val primaryNeeds = columnNames.filter(col => primaryNeedsStartWith.exists(col.startsWith(_)))
     val workingActivity = columnNames.filter(col => workingStartWith.exists(col.startsWith(_)))
-    val others = (columnNames.toSet -- primaryNeeds -- workingActivity).toList
+    val others = (columnNames.tail.toSet -- primaryNeeds -- workingActivity).toList
+   // others.foreach(println)
 
     (primaryNeeds.map(new Column(_)), workingActivity.map(new Column(_)), others.map(new Column(_)))
   }
@@ -137,14 +142,14 @@ object TimeUsage {
     otherColumns: List[Column],
     df: DataFrame
   ): DataFrame = {
-    val workingStatusProjection: Column = when(df("telfs") >= 1 && df("telfs") < 3, "working").otherwise("not working").as("working")
-    val sexProjection: Column = when(df("tesex") === 1, "male").otherwise("female").as("sex")
-    val ageProjection: Column = when(df("teage") >= 15 && df("teage") <= 22, "young")
-      .when(df("teage") >= 23 && df("teage") <= 55, "active").otherwise("elder").as("age")
+    val workingStatusProjection: Column = when($"telfs" >= 1 && $"telfs" < 3, "working").otherwise("not working").as("working")
+    val sexProjection: Column = when($"tesex" === 1, "male").otherwise("female").as("sex")
+    val ageProjection: Column = when($"teage" >= 15 && $"teage" <= 22, "young")
+      .when($"teage" >= 23 && $"teage" <= 55, "active").otherwise("elder").as("age")
 
-    val primaryNeedsProjection: Column = ???
-    val workProjection: Column = ???
-    val otherProjection: Column = ???
+    val primaryNeedsProjection: Column = primaryNeedsColumns.reduce( _ + _)./(60).as("primaryNeeds")
+    val workProjection: Column = workColumns.reduce(_ + _)./(60).as("work")
+    val otherProjection: Column = otherColumns.reduce(_ + _)./(60).as("other")
     df
       .select(workingStatusProjection, sexProjection, ageProjection, primaryNeedsProjection, workProjection, otherProjection)
       .where($"telfs" <= 4) // Discard people who are not in labor force
@@ -168,7 +173,9 @@ object TimeUsage {
     * Finally, the resulting DataFrame should be sorted by working status, sex and age.
     */
   def timeUsageGrouped(summed: DataFrame): DataFrame = {
-    ???
+
+    summed.groupBy($"working", $"sex", $"age").agg(round(avg($"primaryNeeds"), 1), round(avg($"work"), 1), round(avg($"other"), 1))
+      .orderBy($"working", $"sex", $"age")
   }
 
   /**
@@ -184,8 +191,13 @@ object TimeUsage {
   /** @return SQL query equivalent to the transformation implemented in `timeUsageGrouped`
     * @param viewName Name of the SQL view to use
     */
-  def timeUsageGroupedSqlQuery(viewName: String): String =
-    ???
+  def timeUsageGroupedSqlQuery(viewName: String): String = {
+    s"""SELECT working, sex, age, round(avg(primaryNeeds), 1), round(avg(work), 1), round(avg(other), 1)
+     FROM $viewName
+     GROUP BY working, sex, age
+     ORDER BY working, sex, age"""
+  }
+
 
   /**
     * @return A `Dataset[TimeUsageRow]` from the “untyped” `DataFrame`
