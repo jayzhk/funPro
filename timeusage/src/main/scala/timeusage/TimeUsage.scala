@@ -32,9 +32,9 @@ object TimeUsage {
     val (columns, initDf) = read("/timeusage/atussum.csv")
     val (primaryNeedsColumns, workColumns, otherColumns) = classifiedColumns(columns)
     val summaryDf = timeUsageSummary(primaryNeedsColumns, workColumns, otherColumns, initDf)
-   // val finalDf = timeUsageGrouped(summaryDf)
+    val finalDf = timeUsageGrouped(summaryDf)
   //  val finalDf = timeUsageGroupedSql(summaryDf)
-    val finalDf = timeUsageGroupedTyped(timeUsageSummaryTyped(summaryDf))
+   // val finalDf = timeUsageGroupedTyped(timeUsageSummaryTyped(summaryDf))
     finalDf.show()
   }
 
@@ -225,8 +225,9 @@ object TimeUsage {
   def timeUsageGroupedTyped(summed: Dataset[TimeUsageRow]): Dataset[TimeUsageRow] = {
     summed.groupByKey(e => (e.working, e.sex, e.age))
       .agg(round(typed.avg[TimeUsageRow](f => f.primaryNeeds), 1).as[Double],
-    round(typed.avg[TimeUsageRow](f => f.work), 1).as[Double], round(typed.avg[TimeUsageRow](f => f.other), 1).as[Double])
-      .orderBy("working", "sex", "age").as[TimeUsageRow]
+           round(typed.avg[TimeUsageRow](f => f.work), 1).as[Double],
+           round(typed.avg[TimeUsageRow](f => f.other), 1).as[Double])
+      .map(k => TimeUsageRow(k._1._1, k._1._2, k._1._3, k._2, k._3, k._4)).orderBy("working", "sex", "age")
   }
 }
 
