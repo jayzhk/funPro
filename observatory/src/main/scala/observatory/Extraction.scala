@@ -48,7 +48,7 @@ object Extraction {
   def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
     val groupedByYear = records.groupBy(k => k._1.getYear).values.head
     val groupedByLocation = groupedByYear.groupBy(k => k._2)
-    val mapReduced = groupedByLocation.mapValues(p => p.aggregate(0.0)((a, b) => a + b._3, (a, b) => a + b))
+    val mapReduced = groupedByLocation.mapValues(p => (p.aggregate(0.0)((a, b) => a + b._3, (a, b) => a + b)) / p.size)
     mapReduced.map(p => (p._1, p._2))
   }
 }
