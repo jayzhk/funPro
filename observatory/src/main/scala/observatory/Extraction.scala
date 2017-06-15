@@ -3,6 +3,7 @@ package observatory
 import java.io.{BufferedReader, InputStreamReader}
 import java.time.LocalDate
 
+
 import scala.io.Source
 
 /**
@@ -21,18 +22,25 @@ object Extraction {
     */
   def locateTemperatures(year: Int, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Double)] = {
 
-    val stations = Source.fromFile(stationsFile).getLines().map(line => line.split(",")).filter( s => s(2) != "" && s(3) != "")
+    val stations = Source.fromInputStream(getClass.getResourceAsStream(stationsFile))
+      .getLines().map(line => line.split(",")).filter( s => s.size > 2)
     val stationPairs = stations.map(line => (Key(line(0), line(1)), Location(line(2).toDouble, line(3).toDouble))).toMap
-    val temperatures = Source.fromFile(temperaturesFile).getLines().map(line => line.split(","));
-    val temperaturePair = temperatures.map(line => (Key(line(0), line(1)), LocalDate.of(year, line(2).toInt, line(3).toInt), line(4).toDouble))
-    temperaturePair.map(temp => {
-      val location = stationPairs.get(temp._1)
-      (temp._2, location, (temp._3 - 32)* (5 / 9))
-    })
+    val temperatures = Source.fromInputStream(getClass.getResourceAsStream(temperaturesFile)).getLines()
+      .map(line => line.split(","));
+    val temperaturePairs = temperatures.map(line => (
+        Key(line(0), line(1)),
+        LocalDate.of(year, line(2).toInt, line(3).toInt),
+        line(4).toDouble
+      )
+    )
 
+    val combined = for {(key, date, temp) <- temperaturePairs
+         loc = stationPairs.get(key)
+         if (loc != None)
+         f = (temp - 32) * 5 /9
+    } yield (date, loc.get, math.BigDecimal(f).setScale(1, BigDecimal.RoundingMode.HALF_UP).toDouble)
 
-
-
+    combined.toSeq
   }
 
   /**
@@ -40,8 +48,11 @@ object Extraction {
     * @return A sequence containing, for each location, the average temperature over the year.
     */
   def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
-    ???
+     val groupByYear = records.map(p => (p._1.getYear, (p._2, p._3)));
+
+
+    groupByYear.flatMap(p => p._2.)
+    //???
+
   }
 }
-
-case class Station(stnId: Int, wbanId:)
