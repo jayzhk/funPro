@@ -1,8 +1,6 @@
 package observatory
 
-import java.io.{BufferedReader, InputStreamReader}
 import java.time.LocalDate
-
 
 import scala.io.Source
 
@@ -48,11 +46,9 @@ object Extraction {
     * @return A sequence containing, for each location, the average temperature over the year.
     */
   def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
-     val groupByYear = records.map(p => (p._1.getYear, (p._2, p._3)));
-
-
-    groupByYear.flatMap(p => p._2.)
-    //???
-
+    val groupedByYear = records.groupBy(k => k._1.getYear).values.head
+    val groupedByLocation = groupedByYear.groupBy(k => k._2)
+    val mapReduced = groupedByLocation.mapValues(p => p.aggregate(0.0)((a, b) => a + b._3, (a, b) => a + b))
+    mapReduced.map(p => (p._1, p._2))
   }
 }
