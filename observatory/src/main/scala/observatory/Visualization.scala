@@ -18,16 +18,19 @@ object Visualization {
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
 
-    val tempDistancePairs = temperatures.map(p => (p._2, greatCyclePhi(p._1, location) * radius)).toMap
+     val matches = temperatures.find(p => p._1 == location)
+    if(matches != None) matches.get._2
+    else {
+      val tempDistancePairs = temperatures.map(p => (p._2, greatCycleDistance(p._1, location))).toMap
       //.filter(pair => pair._1 < 1)
-    val weights = tempDistancePairs.mapValues( 1 / pow(_, power))
-
-    weights.map(p => p._1 * p._2).sum / weights.values.sum
+      val weights = tempDistancePairs.mapValues(1 / pow(_, power))
+      weights.map(p => p._1 * p._2).sum / weights.values.sum
+    }
 
   }
 
-  def greatCyclePhi(p1 : Location, p2 : Location ) : Double  = {
-    acos(sin(p1.lat) * sin(p2.lat) + cos(p1.lat) * cos(p2.lat) * cos(abs(p1.lon - p2.lon)))
+  def greatCycleDistance(p1 : Location, p2 : Location ) : Double  = {
+    acos(sin(p1.lat) * sin(p2.lat) + cos(p1.lat) * cos(p2.lat) * cos(abs(p1.lon - p2.lon))) * radius
   }
 
   /**
@@ -36,7 +39,26 @@ object Visualization {
     * @return The color that corresponds to `value`, according to the color scale defined by `points`
     */
   def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = {
-    ???
+    val sorted = points.toList.sortWith((a, b) => a._1 < b._1)
+    if(sorted.head._1 >= value ) sorted.head._2
+    else if (sorted.last._1 <= value) sorted.last._2
+    else {
+      val upper = sorted.indexWhere(p => p._1 > value)
+      val lower = upper - 1
+       linearInterpolate(sorted(lower), sorted(upper), value)
+    }
+  }
+
+  def linearInterpolate( lower: (Double, Color), upper: (Double, Color), x: Double) : Color = {
+
+    val (r, g, b) = upper._2 - lower._2
+    val deltaTemp = upper._1 - lower._1
+    val c = x - lower._1
+    Color(
+      (lower._2.red +  c * r / deltaTemp).toInt,
+      (lower._2.green + c * g / deltaTemp).toInt,
+      (lower._2.blue + c * b / deltaTemp).toInt
+    )
   }
 
   /**
