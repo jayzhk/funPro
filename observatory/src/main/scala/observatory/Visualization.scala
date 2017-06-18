@@ -1,6 +1,7 @@
 package observatory
 
-import com.sksamuel.scrimage.Image
+import com.sksamuel.scrimage.{Image, Pixel}
+
 import scala.math._
 
 /**
@@ -52,14 +53,18 @@ object Visualization {
   def linearInterpolate( lower: (Double, Color), upper: (Double, Color), x: Double) : Color = {
 
     val (r, g, b) = upper._2 - lower._2
+    println(s"the r g b == $r , $g, $b")
     val deltaTemp = upper._1 - lower._1
     val c = x - lower._1
-    Color(
-      (lower._2.red +  c * r / deltaTemp).toInt,
-      (lower._2.green + c * g / deltaTemp).toInt,
-      (lower._2.blue + c * b / deltaTemp).toInt
+    val (r1, g1, b1 ) = (
+      lower._2.red +  c * (r / deltaTemp),
+      lower._2.green + c * (g / deltaTemp),
+      lower._2.blue + c * (b / deltaTemp)
     )
+    println(s"the r g b == $r1 , $g1, $b1")
+    Color(math.round(r1).toInt, math.round(g1).toInt, math.round(b1).toInt)
   }
+
 
   /**
     * @param temperatures Known temperatures
@@ -67,7 +72,20 @@ object Visualization {
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
-    ???
+
+    // first to construct the pixels
+    val colorCoordinatePairs  = temperatures.map(p => (convert(p._1), interpolateColor(colors, p._2)))
+    val pixels = colorCoordinatePairs.map(p => (p._1._1 + p._1._1 * p._1._2, Pixel(p._2.red, p._2.green, p._2.blue, 0)))
+
+    val pixelArray = new Array[Pixel](360 * 180)
+    pixels.foreach(p => pixelArray.update(p._1, p._2))
+
+    Image(360, 180, pixelArray)
+
+  }
+
+  def convert(loc: Location) : (Int, Int) = {
+    ((loc.lat + 180).toInt, (loc.lon + 90).toInt)
   }
 
 }
