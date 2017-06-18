@@ -57,9 +57,9 @@ object Visualization {
     val deltaTemp = upper._1 - lower._1
     val c = x - lower._1
     val (r1, g1, b1 ) = (
-      lower._2.red +  c * (r / deltaTemp),
-      lower._2.green + c * (g / deltaTemp),
-      lower._2.blue + c * (b / deltaTemp)
+       r * (c / deltaTemp),
+       g * (c / deltaTemp),
+       b * (c  / deltaTemp)
     )
     println(s"the r g b == $r1 , $g1, $b1")
     Color(math.round(r1).toInt, math.round(g1).toInt, math.round(b1).toInt)
