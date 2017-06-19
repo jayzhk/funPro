@@ -1,6 +1,8 @@
 package observatory
 
 
+import java.io.File
+
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
@@ -20,8 +22,9 @@ class VisualizationTest extends FunSuite with Checkers {
 
     val result = Extraction.locateTemperatures(2015, "/testStation.csv", "/testTemperature.csv")
     val converted = Extraction.locationYearlyAverageRecords(result)
+    println(converted)
 
-    val loc3 = Location(37.358,-78.450)
+    val loc3 = Location(37.37,-78.44)
     //val loc2 = Location(37.350,-78.433)
     val temp = Visualization.predictTemperature(converted, loc3)
     println(temp)
@@ -59,6 +62,17 @@ class VisualizationTest extends FunSuite with Checkers {
     val points = List(1, 2, 3, 4, 5)
     val index = points.indexWhere(p => p >= 2)
     println(index)
+  }
+
+  test("visualize") {
+
+    val result = Extraction.locateTemperatures(2015, "/testStation.csv", "/testTemperature.csv")
+    val converted = Extraction.locationYearlyAverageRecords(result)
+    println(converted)
+    val scales = List((60.0, Color(255, 255, 255)), (32.0, Color(255, 0, 0)), (12.0, Color(255, 255, 0)), (0.0, Color(0, 255, 255)))
+    val image = Visualization.visualize(converted, scales)
+   val imageFile =  image.output(new File("/myimage.png"))
+    println(imageFile.getAbsolutePath)
   }
 
 }
