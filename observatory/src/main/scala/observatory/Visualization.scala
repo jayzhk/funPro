@@ -23,7 +23,7 @@ object Visualization {
     if(matches.isDefined) matches.get._2
     else {
       val tempDistancePairs = temperatures.map(p => (p._2, greatCycleDistance(p._1, location))).toMap
-     // .filter(pair => pair._1 < 50)
+      .filter(pair => pair._1 < 50)
       println(tempDistancePairs)
       val weights = tempDistancePairs.mapValues(1 / pow(_, power))
       weights.map(p => p._1 * p._2).sum / weights.values.sum
@@ -85,7 +85,10 @@ object Visualization {
   }
 
   def convert(loc: Location) : (Int, Int) = {
-    ((loc.lat + 180).toInt, (loc.lon + 90).toInt)
+   // println(loc)
+    ((math.round(loc.lat) + 90).toInt, (math.round(loc.lon) + 180).toInt)
+   // println(pair)
+   // pair
   }
 
 }

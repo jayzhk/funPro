@@ -66,13 +66,19 @@ class VisualizationTest extends FunSuite with Checkers {
 
   test("visualize") {
 
-    val result = Extraction.locateTemperatures(2015, "/testStation.csv", "/testTemperature.csv")
+    val result = Extraction.locateTemperatures(2015, "/stations.csv", "/1975.csv")
     val converted = Extraction.locationYearlyAverageRecords(result)
-    println(converted)
+    //println(converted)
     val scales = List((60.0, Color(255, 255, 255)), (32.0, Color(255, 0, 0)), (12.0, Color(255, 255, 0)), (0.0, Color(0, 255, 255)))
     val image = Visualization.visualize(converted, scales)
-   val imageFile =  image.output(new File("/myimage.png"))
+    val imageFile =  image.output(new File("myimage.png"))
     println(imageFile.getAbsolutePath)
+  }
+
+  test("convert string to integer") {
+    val format = "+00.000"
+    //val value = Integer.parseInt(format)
+    val value = java.lang.Double.parseDouble(format)
   }
 
 }

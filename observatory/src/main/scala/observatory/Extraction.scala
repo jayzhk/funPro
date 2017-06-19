@@ -21,13 +21,13 @@ object Extraction {
   def locateTemperatures(year: Int, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Double)] = {
 
     val stations = Source.fromInputStream(getClass.getResourceAsStream(stationsFile))
-      .getLines().map(line => line.split(",")).filter( s => s.size > 2)
+      .getLines().map(line => line.split(",")).filter( s => s.size > 3)
     val stationPairs = stations.map(line => (Key(line(0), line(1)), Location(line(2).toDouble, line(3).toDouble))).toMap
     val temperatures = Source.fromInputStream(getClass.getResourceAsStream(temperaturesFile)).getLines()
-      .map(line => line.split(","));
+      .map(line => line.split(",")).filter(line => line.size > 2);
     val temperaturePairs = temperatures.map(line => (
         Key(line(0), line(1)),
-        LocalDate.of(year, line(2).toInt, line(3).toInt),
+        LocalDate.of(year, line(2).toDouble.toInt, line(3).toDouble.toInt),
         line(4).toDouble
       )
     )
