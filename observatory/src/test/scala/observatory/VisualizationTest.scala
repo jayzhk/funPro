@@ -20,14 +20,14 @@ class VisualizationTest extends FunSuite with Checkers {
 
   test("test predict temperature") {
 
-    val result = Extraction.locateTemperatures(2015, "/testStation.csv", "/testTemperature.csv")
+    val result = Extraction.locateTemperatures(1975, "/stations.csv", "/1975.csv")
     val converted = Extraction.locationYearlyAverageRecords(result)
     println(converted)
 
     val loc3 = Location(37.37,-78.44)
     //val loc2 = Location(37.350,-78.433)
     val temp = Visualization.predictTemperature(converted, loc3)
-    println(temp)
+    //println(temp)
 
   }
 
