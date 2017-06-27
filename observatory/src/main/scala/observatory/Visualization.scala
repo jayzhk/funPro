@@ -74,7 +74,7 @@ object Visualization {
 
     // first to construct the pixels
     val colorCoordinatePairs  = temperatures.map(p => (convert(p._1), interpolateColor(colors, p._2)))
-    val pixels = colorCoordinatePairs.map(p => (p._1._1 + p._1._1 * p._1._2, Pixel(p._2.red, p._2.green, p._2.blue, 255)))
+    val pixels = colorCoordinatePairs.map(p => (p._1._1 + p._1._1 * p._1._2, Pixel(p._2.red, p._2.green, p._2.blue, 127)))
 
     val pixelArray = Array.fill[Pixel](360 * 180)(Pixel(0, 255, 255, 255))
 
