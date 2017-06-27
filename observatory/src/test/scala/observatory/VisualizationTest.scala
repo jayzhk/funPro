@@ -11,7 +11,7 @@ import org.scalatest.prop.Checkers
 @RunWith(classOf[JUnitRunner])
 class VisualizationTest extends FunSuite with Checkers {
 
-  val points = Iterable(
+  lazy val points = Iterable(
     (60.0, Color(255, 255, 255)),
     (32.0, Color(255, 0, 0)),
     (12.0, Color(255, 255, 0)),
@@ -57,6 +57,19 @@ class VisualizationTest extends FunSuite with Checkers {
     println(result)
   }
 
+  test("test predict temperature and color interpolate"){
+    //val temperature = List((Location(0.0,0.0),10.0))
+   val temperature = List((Location(45.0,-90.0),10.0), (Location(-45.0,0.0),20.0))
+    val location = Location(90.0, -180.0)
+    val predicted = Visualization.predictTemperature(temperature, location)
+    val points = List((1.0,Color(0,0,255)), (45.500012281326605,Color(255,0,0)))
+    val color = Visualization.interpolateColor(points, predicted)
+
+    println(s" predicted temperature = $predicted , color = $color" )
+
+
+  }
+
   test("test interpolate color") {
 
 
@@ -88,21 +101,31 @@ class VisualizationTest extends FunSuite with Checkers {
     println(index)
   }
 
-//  test("visualize") {
-//
-//    val result = Extraction.locateTemperatures(2015, "/stations.csv", "/1975.csv")
-//    val converted = Extraction.locationYearlyAverageRecords(result)
-//    //println(converted)
-//    val scales = List((60.0, Color(255, 255, 255)), (32.0, Color(255, 0, 0)), (12.0, Color(255, 255, 0)), (0.0, Color(0, 255, 255)))
-//    val image = Visualization.visualize(converted, scales)
-//    val imageFile =  image.output(new File("myimage.png"))
-//    println(imageFile.getAbsolutePath)
-//  }
-//
-//  test("convert string to integer") {
-//    val format = "+00.000"
-//    //val value = Integer.parseInt(format)
-//    val value = java.lang.Double.parseDouble(format)
-//  }
+  test("visualize") {
+
+    val result = Extraction.locateTemperatures(2015, "/stations.csv", "/1975.csv")
+    val converted = Extraction.locationYearlyAverageRecords(result)
+    //println(converted)
+    //lazy val scales = List((60.0, Color(255, 255, 255)), (32.0, Color(255, 0, 0)), (12.0, Color(255, 255, 0)), (0.0, Color(0, 255, 255)))
+    val image = Visualization.visualize(converted, points)
+    val imageFile =  image.output(new File("myimage.png"))
+    println(imageFile.getAbsolutePath)
+  }
+
+  test("convert string to integer") {
+    val format = "+00.000"
+    //val value = Integer.parseInt(format)
+    val value = java.lang.Double.parseDouble(format)
+  }
+
+  test("for expression ") {
+    val values = for{
+
+      y <- 90 until -90 by -1
+      x <- -180 until 180
+    } yield (y, x)
+    println(s"value size = ${values.size}")
+    println(values)
+  }
 
 }

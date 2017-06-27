@@ -11,6 +11,8 @@ object Visualization {
 
   val radius = 6371
   val power = 2
+  val IMAGE_WIDTH = 360
+  val IMAGE_HEIGHT = 180
 
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
@@ -19,12 +21,12 @@ object Visualization {
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
 
-     val matches = temperatures.find(p => p._1 == location || greatCycleDistance(p._1, location) <= 1)
+    val matches = temperatures.find(p => p._1 == location || greatCycleDistance(p._1, location) <= 1)
     if(matches.isDefined) matches.get._2
     else {
       val tempDistancePairs = temperatures.map(p => (p._2, greatCycleDistance(p._1, location))).toMap
       //.filter(pair => pair._1 > 1)
-      println(tempDistancePairs.size)
+     // println(tempDistancePairs.size)
       val weights = tempDistancePairs.mapValues(1 / pow(_, power))
       weights.map(p => p._1 * p._2).sum / weights.values.sum
     }
@@ -32,7 +34,8 @@ object Visualization {
   }
 
   def greatCycleDistance(p1 : Location, p2 : Location ) : Double  = {
-    acos(sin(toRadians(p1.lat)) * sin(toRadians(p2.lat)) + cos(toRadians(p1.lat)) * cos(toRadians(p2.lat)) * cos(toRadians(abs(p1.lon - p2.lon)))) * radius
+    acos(sin(toRadians(p1.lat)) * sin(toRadians(p2.lat)) +
+      cos(toRadians(p1.lat)) * cos(toRadians(p2.lat)) * cos(toRadians(abs(p1.lon - p2.lon)))) * radius
   }
 
   /**
@@ -42,7 +45,7 @@ object Visualization {
     */
   def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = {
     val sorted = points.toList.sortWith((a, b) => a._1 < b._1)
-    //println(sorted)
+  //  println(s"The passed in parameters =  $sorted")
     if(sorted.head._1 >= value ) sorted.head._2
     else if (sorted.last._1 <= value) sorted.last._2
     else {
@@ -73,15 +76,15 @@ object Visualization {
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
 
-    // first to construct the pixels
-    val colorCoordinatePairs  = temperatures.map(p => (convert(p._1), interpolateColor(colors, p._2)))
-    val pixels = colorCoordinatePairs.map(p => (p._1._1 + p._1._1 * p._1._2, Pixel(p._2.red, p._2.green, p._2.blue, 127)))
 
-    val pixelArray = Array.fill[Pixel](360 * 180)(Pixel(0, 255, 255, 255))
+    val predicts = for {
+      lon <- -180 until 180
+      lan <- 90 until -90 by -1
+    } yield Visualization.predictTemperature(temperatures, Location(lan, lon))
 
-    pixels.foreach(p => pixelArray.update(p._1, p._2))
-
-    Image(360, 180, pixelArray)
+    val predictedColors = predicts.map(p => interpolateColor(colors, p))
+    val pixelArray = predictedColors.map(p =>Pixel(p.red, p.green, p.blue, 127)).toArray
+    Image(IMAGE_WIDTH, IMAGE_HEIGHT, pixelArray)
 
   }
 
