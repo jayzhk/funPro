@@ -34,7 +34,7 @@ object Extraction {
 
     val combined = for {(key, date, temp) <- temperaturePairs
          loc = stationPairs.get(key)
-         if (loc != None)
+         if (loc.isDefined)
          f = (temp - 32) * 5 /9
     } yield (date, loc.get, math.BigDecimal(f).setScale(1, BigDecimal.RoundingMode.HALF_UP).toDouble)
 

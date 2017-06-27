@@ -19,12 +19,12 @@ object Visualization {
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
 
-     val matches = temperatures.find(p => p._1 == location)
+     val matches = temperatures.find(p => p._1 == location || greatCycleDistance(p._1, location) <= 1)
     if(matches.isDefined) matches.get._2
     else {
       val tempDistancePairs = temperatures.map(p => (p._2, greatCycleDistance(p._1, location))).toMap
-      .filter(pair => pair._1 < 50)
-      println(tempDistancePairs)
+      //.filter(pair => pair._1 > 1)
+      println(tempDistancePairs.size)
       val weights = tempDistancePairs.mapValues(1 / pow(_, power))
       weights.map(p => p._1 * p._2).sum / weights.values.sum
     }
@@ -32,7 +32,7 @@ object Visualization {
   }
 
   def greatCycleDistance(p1 : Location, p2 : Location ) : Double  = {
-    acos(sin(p1.lat) * sin(p2.lat) + cos(p1.lat) * cos(p2.lat) * cos(abs(p1.lon - p2.lon))) * radius
+    acos(sin(toRadians(p1.lat)) * sin(toRadians(p2.lat)) + cos(toRadians(p1.lat)) * cos(toRadians(p2.lat)) * cos(toRadians(abs(p1.lon - p2.lon)))) * radius
   }
 
   /**
@@ -42,6 +42,7 @@ object Visualization {
     */
   def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = {
     val sorted = points.toList.sortWith((a, b) => a._1 < b._1)
+    //println(sorted)
     if(sorted.head._1 >= value ) sorted.head._2
     else if (sorted.last._1 <= value) sorted.last._2
     else {
