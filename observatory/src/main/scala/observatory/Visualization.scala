@@ -21,15 +21,24 @@ object Visualization {
     */
   def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
 
-    val matches = temperatures.find(p => p._1 == location || greatCycleDistance(p._1, location) <= 1)
-    if(matches.isDefined) matches.get._2
+    val tempDistances = temperatures.map(p => (p._2, greatCycleDistance(p._1, location)))
+    val matches = tempDistances.find(p => p._2 <= 1)
+    if(matches.isDefined) matches.get._1
     else {
-      val tempDistancePairs = temperatures.map(p => (p._2, greatCycleDistance(p._1, location))).toMap
-      //.filter(pair => pair._1 > 1)
-     // println(tempDistancePairs.size)
-      val weights = tempDistancePairs.mapValues(1 / pow(_, power))
-      weights.map(p => p._1 * p._2).sum / weights.values.sum
+      val filtered = tempDistances.filter(p => p._2 > 1).toMap
+      val tempWeightsPairs = filtered.mapValues(1 / pow(_, power))
+
+      tempWeightsPairs.map(p => p._1 * p._2).sum / tempWeightsPairs.values.sum
     }
+
+//    val matches = temperatures.find(p => greatCycleDistance(p._1, location) <= 1)
+//    if(matches.isDefined) matches.get._2
+//    else {
+//      val tempDistancePairs = temperatures.map(p => (p._2, greatCycleDistance(p._1, location))).toMap
+//      .filter(pair => pair._2 > 1)
+//      val weights = tempDistancePairs.mapValues(1 / pow(_, power))
+//      weights.map(p => p._1 * p._2).sum / weights.values.sum
+//    }
 
   }
 
@@ -51,6 +60,7 @@ object Visualization {
     else {
       val upper = sorted.indexWhere(p => p._1 > value)
       val lower = upper - 1
+       println(s"sorted interval = $sorted with size = ${sorted.size}, upper bound = $upper, lower bound = $lower")
        linearInterpolate(sorted(lower), sorted(upper), value)
     }
   }
@@ -76,11 +86,16 @@ object Visualization {
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
 
-
-    val predicts = for {
-      lon <- -180 until 180
+    val locations = for {
       lan <- 90 until -90 by -1
-    } yield Visualization.predictTemperature(temperatures, Location(lan, lon))
+      lon <- -180 until 180
+    } yield Location(lan, lon)
+
+  //  println(s"converted locations = $locations")
+
+    val predicts = locations.map(p => predictTemperature(temperatures, p))
+
+   // println(s"predicted temperatures = $predicts")
 
     val predictedColors = predicts.map(p => interpolateColor(colors, p))
     val pixelArray = predictedColors.map(p =>Pixel(p.red, p.green, p.blue, 127)).toArray
