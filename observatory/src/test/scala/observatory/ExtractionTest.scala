@@ -9,14 +9,14 @@ class ExtractionTest extends FunSuite {
 
 
   test("combine location and temperature") {
-    val result = Extraction.locateTemperatures(2015, "/testStation.csv", "/testTemperature.csv")
+    val result = Extraction.locateTemperatures(2015, "/testStation.csv", "/2017.csv")
     result.foreach(println)
 
   }
 
   test("test extraction for average per year") {
 
-    val result = Extraction.locateTemperatures(2015, "/testStation.csv", "/testTemperature.csv")
+    val result = Extraction.locateTemperatures(2015, "/testStation.csv", "/2017.csv")
     val converted = Extraction.locationYearlyAverageRecords(result)
     converted.foreach(println)
   }

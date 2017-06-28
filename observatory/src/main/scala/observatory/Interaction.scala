@@ -1,10 +1,9 @@
 package observatory
 
 import com.sksamuel.scrimage.{Image, Pixel}
-import observatory.Visualization._
-
 
 import scala.math._
+import observatory.Visualization._
 
 /**
   * 3rd milestone: interactive visualization
@@ -18,7 +17,12 @@ object Interaction {
     * @return The latitude and longitude of the top-left corner of the tile, as per http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
     */
   def tileLocation(zoom: Int, x: Int, y: Int): Location = {
-    Location(atan(sinh(Pi - (y / pow(2, zoom)) * 2 * Pi )) * 180 / Pi , (x / pow(2.0, zoom)) * 360 - 180)
+    println(s"x = $x and y = $y and zoom = $zoom")
+   // val location = Location(atan(sinh(Pi - (y / (1 << zoom)) * 2 * Pi )) * 180 / Pi , (x.toDouble / (1 << zoom)) * 360 - 180)
+    val location = Location(toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y.toDouble / (1<<zoom))))),
+    x.toDouble / (1<<zoom) * 360.0 - 180.0)
+    println(s" location: lan = ${location.lat} and lon = ${location.lon}")
+    location
   }
 
   /**
@@ -34,18 +38,17 @@ object Interaction {
     val locations = for{
       i <- x to x + 255
       j <- y to y + 255
-    } yield tileLocation(zoom, i, j)
+    } yield { tileLocation(zoom, i, j)}
 
-    val matches = for{
-       i <- 0 until locations.size
-    } yield (i, Visualization.predictTemperature(temperatures, locations(i)))
+    println(locations.take(50))
 
-    val pixArray = Array.fill[Pixel](256 * 256)(Pixel(255, 255, 255, 127))
-    matches.foreach(p => {
-      val color = interpolateColor(colors, p._2)
-      pixArray.update(p._1, Pixel(color.red, color.green, color.blue, 127))
-      })
-    Image(256, 256, pixArray)
+    val predictedTemperatures = locations.map(loc => predictTemperature(temperatures, loc) )
+
+    val matches = predictedTemperatures.map(temp => interpolateColor(colors, temp))
+
+    val pixelArray = matches.map(p =>Pixel(p.red, p.green, p.blue, 127)).toArray
+
+    Image(256, 256, pixelArray)
 
   }
 

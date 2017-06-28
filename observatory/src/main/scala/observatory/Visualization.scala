@@ -60,7 +60,7 @@ object Visualization {
     else {
       val upper = sorted.indexWhere(p => p._1 > value)
       val lower = upper - 1
-       println(s"sorted interval = $sorted with size = ${sorted.size}, upper bound = $upper, lower bound = $lower")
+       //println(s"sorted interval = $sorted with size = ${sorted.size}, upper bound = $upper, lower bound = $lower")
        linearInterpolate(sorted(lower), sorted(upper), value)
     }
   }
