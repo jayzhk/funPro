@@ -23,7 +23,7 @@ class InteractionTest extends FunSuite with Checkers {
   )
 
   test("test convert coordinator to lat and lon") {
-    val result = Interaction.tileLocation(2, 3, 3 )
+    val result = Interaction.tileLocation(1, 3, 3 )
     println(result)
   }
 
