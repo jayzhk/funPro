@@ -31,15 +31,6 @@ object Visualization {
       tempWeightsPairs.map(p => p._1 * p._2).sum / tempWeightsPairs.values.sum
     }
 
-//    val matches = temperatures.find(p => greatCycleDistance(p._1, location) <= 1)
-//    if(matches.isDefined) matches.get._2
-//    else {
-//      val tempDistancePairs = temperatures.map(p => (p._2, greatCycleDistance(p._1, location))).toMap
-//      .filter(pair => pair._2 > 1)
-//      val weights = tempDistancePairs.mapValues(1 / pow(_, power))
-//      weights.map(p => p._1 * p._2).sum / weights.values.sum
-//    }
-
   }
 
   def greatCycleDistance(p1 : Location, p2 : Location ) : Double  = {
