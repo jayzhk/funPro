@@ -16,12 +16,8 @@ object Interaction {
     * @return The latitude and longitude of the top-left corner of the tile, as per http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
     */
   def tileLocation(zoom: Int, x: Int, y: Int): Location = {
-   //println(s"x = $x and y = $y and zoom = $zoom")
-   // val location = Location(atan(sinh(Pi - (y / (1 << zoom)) * 2 * Pi )) * 180 / Pi , (x.toDouble / (1 << zoom)) * 360 - 180)
-    val location = Location(toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y.toDouble / (1<<zoom))))),
+    Location(toDegrees(atan(sinh(Pi * (1.0 - 2.0 * y.toDouble / (1<<zoom))))),
     x.toDouble / (1<<zoom) * 360.0 - 180.0)
-    //println(s" location: lan = ${location.lat} and lon = ${location.lon}")
-    location
   }
 
   def locationTile(zoom: Int, lat : Double, lon: Double) : (Int, Int) = {
@@ -30,7 +26,7 @@ object Interaction {
   }
 
 
-  def covertToCord(zoom : Int, loc : Location): (Int, Int) = {
+  def convertCord(zoom : Int, loc : Location): (Int, Int) = {
 
     val converted_x = (128 / Pi) * ( 1 << zoom) * (toRadians(loc.lon) + Pi)
     val converted_y = (128 / Pi) * (1 << zoom) * (Pi - log(tan(Pi / 4 + toRadians(loc.lat) / 2 )))
@@ -47,25 +43,13 @@ object Interaction {
     */
   def tile(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, x: Int, y: Int): Image = {
 
-    val location = tileLocation(zoom, x, y)
-    println(s"location = $location ${360.0 /(1 << 0) / 256}")
-    val step_y = 360.0 / (1 << zoom) / 256.0
-    val step_x  = 180.0 / (1 << zoom) / 256.0
-
-    println(s"step_x = $step_x  step_y = $step_y")
-
     val locations = for {
-       a <- location.lat until ( location.lat + 180 / (1 << zoom)) by step_x
-       b <- location.lon until ( location.lon + 360 / (1 << zoom) ) by step_y
-    } yield Location(a , b)
+      a <- x * 256 until x * 256 + 256
+      b <- y * 256 until y * 256 + 256
+    } yield tileLocation(zoom + 8, a, b)
 
-    println(s"locations size = ${locations.size}")
-
-
-
-     //val cord = convert(location)
-
-
+    println(s"location 0 =  ${locations(0)} and location last = ${locations(256 * 256 -1)}")
+    println(s"cord 0 =  ${convertCord(zoom, locations(0))} and cord last = ${convertCord(zoom, locations(256 * 256 -1))}")
 
     val predictedTemperatures = locations.map(loc => predictTemperature(temperatures, loc) )
 
@@ -74,7 +58,7 @@ object Interaction {
     val pixelArray = matches.map(p =>Pixel(p.red, p.green, p.blue, 127)).toArray
 
     Image(256, 256, pixelArray)
-   // ???
+
   }
 
   /**

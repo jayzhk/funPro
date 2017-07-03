@@ -2,6 +2,7 @@ package observatory
 
 import java.io.File
 
+import com.sksamuel.scrimage.Image
 import observatory.Interaction._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -25,15 +26,15 @@ class InteractionTest extends FunSuite with Checkers {
 
   test("test convert coordinator to lat and lon") {
 
-    println(scala.math.log(scala.math.E))
+    //println(scala.math.log(scala.math.E))
 
     val level0 = tileLocation(0, 0, 0 )
-    println(level0)
+   // println(level0)
 
     val level1 = List(
       tileLocation(1, 0, 0)
-     ,tileLocation(1, 0, 1)
      ,tileLocation(1, 1, 0)
+     ,tileLocation(1, 0, 1)
      ,tileLocation(1, 1, 1)
     )
 
@@ -57,35 +58,56 @@ class InteractionTest extends FunSuite with Checkers {
     )
 
     level1.foreach(println(_))
-    level1.foreach( p => println(locationTile(1, p.lat, p.lon )))
+   // level1.foreach( p => println(locationTile(1, p.lat, p.lon )))
 
 
-    level2.foreach(println(_))
-    level2.foreach( p => println(Interaction.covertToCord(2, p)))
-    level2.foreach(p => println(locationTile(2, p.lat, p.lon)))
-
+//    level2.foreach(println(_))
+//    level2.foreach( p => println(convertCord(2, p)))
+//    level2.foreach(p => println(locationTile(2, p.lat, p.lon)))
 
   }
+
+//  test("tile location zoom = 8 ") {
+//    val level1 = List(
+//       tileLocation(1, 0, 0)
+//      ,tileLocation(1, 0, 1)
+//      ,tileLocation(1, 1, 0)
+//      ,tileLocation(1, 1, 1)
+//    )
+//    level1.foreach(println(_))
+//    level1.foreach( p => println(locationTile(1, p.lat, p.lon )))
+//
+//  }
 
 
 
   test("generate tiles of 256 * 256") {
+
+    //val result = Extraction.locateTemperatures(1975, "/stations.csv", "/1975.csv")
     val result = Extraction.locateTemperatures(2017, "/testStation.csv", "/2017.csv")
     val converted = Extraction.locationYearlyAverageRecords(result)
 
-    val image = Interaction.tile(converted, points, 0, 0, 0)
+    val image0 = tile(converted, points, 0, 0, 0)
+    val imageFile0 =  image0.output(new File("image0-0.png"))
 
-    val imageFile =  image.output(new File("myimage2.png"))
+    val image1 = tile(converted, points, 1, 0, 0)
+    val image2 = tile(converted, points, 1, 1, 0)
+    val image3 = tile(converted, points, 1, 0, 1)
+    val image4 = tile(converted, points, 1, 1, 1)
+
+    val image5 =  Image(512 , 512, image1.pixels ++ image2.pixels ++ image3.pixels ++ image4.pixels)
+    val imageFile1 =  image5.output(new File("image1-1.png"))
+
+    val image6 = image5.scaleTo(256, 256)
+    val imageFile2 =  image6.output(new File("image2-2.png"))
+
+
     //println(imageFile.getAbsolutePath)
   }
-//
-//  test("test converted x and y") {
-//    val zoom = 1
-//    val loc = tileLocation(2, 0, 1)
-//    val converted_x = (128 / Pi) * ( 1 << zoom) * (toRadians(loc.lon))
-//    val converted_y = (128 / Pi) * (1 << zoom) * (Pi - log1p(Pi / 4 + toRadians(loc.lat)))
-//
-//    println(s"x = $converted_x  and y = $converted_y")
-//  }
+
+
+
+
+
 
 }

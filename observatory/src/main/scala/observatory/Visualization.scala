@@ -45,14 +45,16 @@ object Visualization {
     */
   def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = {
     val sorted = points.toList.sortWith((a, b) => a._1 < b._1)
-  //  println(s"The passed in parameters =  $sorted")
     if(sorted.head._1 >= value ) sorted.head._2
     else if (sorted.last._1 <= value) sorted.last._2
     else {
-      val upper = sorted.indexWhere(p => p._1 > value)
-      val lower = upper - 1
-       //println(s"sorted interval = $sorted with size = ${sorted.size}, upper bound = $upper, lower bound = $lower")
-       linearInterpolate(sorted(lower), sorted(upper), value)
+      val matches = sorted.find(_._1 == value)
+      if(matches.isDefined) matches.get._2
+      else {
+        val upper = sorted.indexWhere(p => p._1 > value)
+        val lower = upper - 1
+        linearInterpolate(sorted(lower), sorted(upper), value)
+      }
     }
   }
 
