@@ -24,6 +24,15 @@ class InteractionTest extends FunSuite with Checkers {
     (-60.0, Color(0, 0, 0))
   )
 
+  lazy val temperatures = Iterable(
+    (Location(80.0, -160.0), -10.0),
+    (Location(30.0, 30.0), 30.0),
+    (Location(5, -80.0), 36.0),
+    (Location(-10, 20), 20.0),
+    (Location(-45, 90), 25.0),
+    (Location(-55, 120), 10.0)
+  )
+
   test("test convert coordinator to lat and lon") {
 
     //println(scala.math.log(scala.math.E))
@@ -83,23 +92,31 @@ class InteractionTest extends FunSuite with Checkers {
 
   test("generate tiles of 256 * 256") {
 
-    //val result = Extraction.locateTemperatures(1975, "/stations.csv", "/1975.csv")
-    val result = Extraction.locateTemperatures(2017, "/testStation.csv", "/2017.csv")
-    val converted = Extraction.locationYearlyAverageRecords(result)
+//   val result = Extraction.locateTemperatures(1975, "/stations.csv", "/1975.csv")
+//    // val result = Extraction.locateTemperatures(2017, "/testStation.csv", "/2017.csv")
+//    val converted = Extraction.locationYearlyAverageRecords(result)
 
-    val image0 = tile(converted, points, 0, 0, 0)
-    val imageFile0 =  image0.output(new File("image0-0.png"))
 
-    val image1 = tile(converted, points, 1, 0, 0)
-    val image2 = tile(converted, points, 1, 1, 0)
-    val image3 = tile(converted, points, 1, 0, 1)
-    val image4 = tile(converted, points, 1, 1, 1)
+
+
+
+    val image0 = tile(temperatures, points, 0, 0, 0)
+    val imageFile0 =  image0.output(new File("image0.png"))
+
+    val image1 = tile(temperatures, points, 1, 0, 0)
+    image1.output(new File("Image0-0.png"))
+    val image2 = tile(temperatures, points, 1, 1, 0)
+    image2.output(new File("Image1-0.png"))
+    val image3 = tile(temperatures, points, 1, 0, 1)
+    image3.output(new File("Image0-1.png"))
+    val image4 = tile(temperatures, points, 1, 1, 1)
+    image4.output(new File("Image1-1.png"))
 
     val image5 =  Image(512 , 512, image1.pixels ++ image2.pixels ++ image3.pixels ++ image4.pixels)
-    val imageFile1 =  image5.output(new File("image1-1.png"))
+    val imageFile1 =  image5.output(new File("Image512.png"))
 
     val image6 = image5.scaleTo(256, 256)
-    val imageFile2 =  image6.output(new File("image2-2.png"))
+    val imageFile2 =  image6.output(new File("Image256.png"))
 
 
     //println(imageFile.getAbsolutePath)

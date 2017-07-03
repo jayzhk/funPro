@@ -48,6 +48,8 @@ object Interaction {
       b <- y * 256 until y * 256 + 256
     } yield tileLocation(zoom + 8, a, b)
 
+    val locationCordPairs = locations.map(loc => (convertCord(zoom, loc), loc))
+
     println(s"location 0 =  ${locations(0)} and location last = ${locations(256 * 256 -1)}")
     println(s"cord 0 =  ${convertCord(zoom, locations(0))} and cord last = ${convertCord(zoom, locations(256 * 256 -1))}")
 
