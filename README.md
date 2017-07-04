@@ -3,4 +3,5 @@
 * Functional Programming Design in Scala  -- passed
 * Pararell Programming in Scala -- passed
 * Big Data analysis with Scala and Spark -- passed
+* Functional Programming in Scala Capstone -- passed
 
