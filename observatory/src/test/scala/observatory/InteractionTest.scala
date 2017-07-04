@@ -2,7 +2,7 @@ package observatory
 
 import java.io.File
 
-import com.sksamuel.scrimage.Image
+import com.sksamuel.scrimage.{Image, Pixel}
 import observatory.Interaction._
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
@@ -103,24 +103,39 @@ class InteractionTest extends FunSuite with Checkers {
     val image0 = tile(temperatures, points, 0, 0, 0)
     val imageFile0 =  image0.output(new File("image0.png"))
 
-    val image1 = tile(temperatures, points, 1, 0, 0)
-    image1.output(new File("Image0-0.png"))
-    val image2 = tile(temperatures, points, 1, 1, 0)
-    image2.output(new File("Image1-0.png"))
-    val image3 = tile(temperatures, points, 1, 0, 1)
-    image3.output(new File("Image0-1.png"))
-    val image4 = tile(temperatures, points, 1, 1, 1)
-    image4.output(new File("Image1-1.png"))
+    val image00 = tile(temperatures, points, 1, 0, 0)
+    image00.output(new File("Image0-0.png"))
 
-    val image5 =  Image(512 , 512, image1.pixels ++ image2.pixels ++ image3.pixels ++ image4.pixels)
+    val image10 = tile(temperatures, points, 1, 1, 0)
+    image10.output(new File("Image1-0.png"))
+
+    val image01 = tile(temperatures, points, 1, 0, 1)
+    image01.output(new File("Image0-1.png"))
+
+    val image11 = tile(temperatures, points, 1, 1, 1)
+    image11.output(new File("Image1-1.png"))
+
+    val combined = Image.filled(512, 512)
+
+    def f(x:Int, y:Int, p: Pixel): Pixel = {
+
+
+      if(x <= 255 && y <= 255) image00.pixel(x, y)
+      else if (x >= 256 && y <= 255) image10.pixel(x - 256, y)
+      else if (x <= 255 && y >= 256) image01.pixel(x, y - 256)
+      else image11.pixel(x - 256, y - 256)
+    }
+
+    val image5 = combined.map(f)
     val imageFile1 =  image5.output(new File("Image512.png"))
 
     val image6 = image5.scaleTo(256, 256)
     val imageFile2 =  image6.output(new File("Image256.png"))
-
-
+    
     //println(imageFile.getAbsolutePath)
   }
+
+
 
 
 

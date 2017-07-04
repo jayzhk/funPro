@@ -44,20 +44,23 @@ object Interaction {
   def tile(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, x: Int, y: Int): Image = {
 
     val locations = for {
-      a <- x * 256 until x * 256 + 256
       b <- y * 256 until y * 256 + 256
+      a <- x * 256 until x * 256 + 256
     } yield tileLocation(zoom + 8, a, b)
 
     val locationCordPairs = locations.map(loc => (convertCord(zoom, loc), loc))
 
-    println(s"location 0 =  ${locations(0)} and location last = ${locations(256 * 256 -1)}")
-    println(s"cord 0 =  ${convertCord(zoom, locations(0))} and cord last = ${convertCord(zoom, locations(256 * 256 -1))}")
+      //locationCordPairs.take(500).foreach(println)
+//    println(s"x = $x, y = $y First =${locations(0)} and last = ${locations(256 * 256 -1)}")
+//    println(s"x = $x, y = $y cord First =  ${convertCord(zoom, locations(0))} and cord last = ${convertCord(zoom, locations(256 * 256 -1))}")
 
     val predictedTemperatures = locations.map(loc => predictTemperature(temperatures, loc) )
 
-    val matches = predictedTemperatures.map(temp => interpolateColor(colors, temp))
+    val predictedColors = predictedTemperatures.map(temp => interpolateColor(colors, temp))
 
-    val pixelArray = matches.map(p =>Pixel(p.red, p.green, p.blue, 127)).toArray
+    val pixelArray = predictedColors.map(p =>Pixel(p.red, p.green, p.blue, 127)).toArray
+
+   // println(s"pixelArray Length ${pixelArray.length}")
 
     Image(256, 256, pixelArray)
 
