@@ -67,41 +67,33 @@ class InteractionTest extends FunSuite with Checkers {
     )
 
     level1.foreach(println(_))
-   // level1.foreach( p => println(locationTile(1, p.lat, p.lon )))
+    level1.foreach( p => println(locationTile(1, p.lat, p.lon )))
 
 
-//    level2.foreach(println(_))
-//    level2.foreach( p => println(convertCord(2, p)))
-//    level2.foreach(p => println(locationTile(2, p.lat, p.lon)))
+    level2.foreach(println(_))
+    level2.foreach( p => println(convertCord(2, p)))
+    level2.foreach(p => println(locationTile(2, p.lat, p.lon)))
 
   }
 
-//  test("tile location zoom = 8 ") {
-//    val level1 = List(
-//       tileLocation(1, 0, 0)
-//      ,tileLocation(1, 0, 1)
-//      ,tileLocation(1, 1, 0)
-//      ,tileLocation(1, 1, 1)
-//    )
-//    level1.foreach(println(_))
-//    level1.foreach( p => println(locationTile(1, p.lat, p.lon )))
-//
-//  }
+  test("tile location zoom = 8 ") {
+    val level1 = List(
+       tileLocation(1, 0, 0)
+      ,tileLocation(1, 0, 1)
+      ,tileLocation(1, 1, 0)
+      ,tileLocation(1, 1, 1)
+    )
+    level1.foreach(println(_))
+    level1.foreach( p => println(locationTile(1, p.lat, p.lon )))
+
+  }
 
 
 
   test("generate tiles of 256 * 256") {
 
-//   val result = Extraction.locateTemperatures(1975, "/stations.csv", "/1975.csv")
-//    // val result = Extraction.locateTemperatures(2017, "/testStation.csv", "/2017.csv")
-//    val converted = Extraction.locationYearlyAverageRecords(result)
-
-
-
-
-
     val image0 = tile(temperatures, points, 0, 0, 0)
-    val imageFile0 =  image0.output(new File("image0.png"))
+    image0.output(new File("image0.png"))
 
     val image00 = tile(temperatures, points, 1, 0, 0)
     image00.output(new File("Image0-0.png"))
@@ -127,19 +119,26 @@ class InteractionTest extends FunSuite with Checkers {
     }
 
     val image5 = combined.map(f)
-    val imageFile1 =  image5.output(new File("Image512.png"))
+    image5.output(new File("Image512.png"))
 
     val image6 = image5.scaleTo(256, 256)
-    val imageFile2 =  image6.output(new File("Image256.png"))
-    
-    //println(imageFile.getAbsolutePath)
+    image6.output(new File("Image256.png"))
   }
 
+  test("test generating all tiles method") {
+    var i = 0
+    val yearData = Iterable((1975, None),(1976, None), (1977, None))
+    //val yearData = Iterable((1975, None))
+    generateTiles[Any](yearData, generateAllTiles)
+    println(s"the size of tiles = $i")
 
+    def generateAllTiles(year:Int, level: Int, x: Int, y: Int, data: Any): Unit = {
+      i = i + 1
+      println(i)
+      println(s"generate tile for year=$year, zoom=$level, x=$x, y=$y data=$data ")
+    }
 
-
-
-
+  }
 
 
 }

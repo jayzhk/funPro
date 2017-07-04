@@ -1,5 +1,8 @@
 package observatory
 
+import observatory.Visualization.predictTemperature
+import scala.math._
+
 /**
   * 4th milestone: value-added information
   */
@@ -11,7 +14,12 @@ object Manipulation {
     *         returns the predicted temperature at this location
     */
   def makeGrid(temperatures: Iterable[(Location, Double)]): (Int, Int) => Double = {
-    ???
+
+      def locationTemperature(lat: Int, lon: Int) : Double = {
+        predictTemperature(temperatures, Location(lat, lon))
+      }
+    locationTemperature
+
   }
 
   /**
@@ -20,7 +28,11 @@ object Manipulation {
     * @return A function that, given a latitude and a longitude, returns the average temperature at this location
     */
   def average(temperaturess: Iterable[Iterable[(Location, Double)]]): (Int, Int) => Double = {
-    ???
+    def avgPerLocation(lat : Int, lon: Int) : Double = {
+      val temperatures = temperaturess.map( temperatures => makeGrid(temperatures)(lat, lon))
+      temperatures.sum / temperatures.size
+    }
+    avgPerLocation
   }
 
   /**
@@ -29,9 +41,19 @@ object Manipulation {
     * @return A grid containing the deviations compared to the normal temperatures
     */
   def deviation(temperatures: Iterable[(Location, Double)], normals: (Int, Int) => Double): (Int, Int) => Double = {
-    ???
+
+    def locationDeviation(lat: Int, lon: Int) : Double = {
+      val temperature = predictTemperature(temperatures, Location(lat, lon))
+      System.err.println(s"templature == $temperature, normals = ${normals(lat, lon)} " +
+        s"an deviation = ${sqrt(pow((normals(lat, lon) - temperature), 2))}")
+      val diff = temperature - normals(lat, lon)
+
+      if(diff >=0 )
+       sqrt(pow(diff, 2))
+      else -sqrt(pow(diff,2))
+
+    }
+    locationDeviation
   }
-
-
 }
 

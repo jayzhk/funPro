@@ -48,19 +48,11 @@ object Interaction {
       a <- x * 256 until x * 256 + 256
     } yield tileLocation(zoom + 8, a, b)
 
-    val locationCordPairs = locations.map(loc => (convertCord(zoom, loc), loc))
-
-      //locationCordPairs.take(500).foreach(println)
-//    println(s"x = $x, y = $y First =${locations(0)} and last = ${locations(256 * 256 -1)}")
-//    println(s"x = $x, y = $y cord First =  ${convertCord(zoom, locations(0))} and cord last = ${convertCord(zoom, locations(256 * 256 -1))}")
-
     val predictedTemperatures = locations.map(loc => predictTemperature(temperatures, loc) )
 
     val predictedColors = predictedTemperatures.map(temp => interpolateColor(colors, temp))
 
     val pixelArray = predictedColors.map(p =>Pixel(p.red, p.green, p.blue, 127)).toArray
-
-   // println(s"pixelArray Length ${pixelArray.length}")
 
     Image(256, 256, pixelArray)
 
@@ -77,7 +69,12 @@ object Interaction {
     yearlyData: Iterable[(Int, Data)],
     generateImage: (Int, Int, Int, Int, Data) => Unit
   ): Unit = {
-    ???
+    System.err.println
+    for {
+      yd <- yearlyData
+      level <- 0 to 3
+      x <- 0 to (1 << level) - 1
+      y <- 0 to (1 << level) - 1
+    } yield generateImage(yd._1, level, x, y, yd._2)
   }
-
 }
